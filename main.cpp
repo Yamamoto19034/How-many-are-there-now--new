@@ -27,9 +27,11 @@
 #define IMAGE_MENU_IMAGE_PATH   TEXT(".\\IMAGE\\操作説明.png")		//ボタンの画像
 #define IMAGE_MENU_BK_PATH      TEXT(".\\IMAGE\\menu_背景.png")		//背景(操作説明画面)の画像
 #define IMAGE_END_CLEAR_PATH	TEXT(".\\IMAGE\\GameClear.png")		//クリアの画像
-#define IMAGE_END_OVER_PATH		TEXT(".\\IMAGE\\sippai.png")		//ゲームオーバーの画像
+#define IMAGE_END_FAIL_PATH		TEXT(".\\IMAGE\\sippai.png")		//ゲームオーバーの画像
 #define IMAGE_MENU_1_PATH		TEXT(".\\IMAGE\\操作説明-1.png")	//操作説明の1枚目
 #define IMAGE_MENU_2_PATH		TEXT(".\\IMAGE\\操作説明-2.png")	//操作説明の2枚目
+#define IMAGE_MESSAGE_1_PATH	TEXT(".\\IMAGE\\message-1.png")		//お客様からのメッセージ(成功パターン)
+#define IMAGE_MESSAGE_2_PATH	TEXT(".\\IMAGE\\message-2.png")     //お客様からのメッセージ(失敗パターン)
 
 //動物チップ関連
 #define GAME_animal1_CHIP_PATH  TEXT(".\\IMAGE\\animal\\mapchip_1.png")  //チップの画像
@@ -146,14 +148,16 @@ double TimeLimit = 0;
 BOOL First_flg = TRUE;
 
 //画像関連
-IMAGE ImageSTARTBK;   //ゲームの背景(スタート画面)
-IMAGE ImagePLAYENDBK; //ゲームの背景(プレイ・エンド画面)
-IMAGE ImageMENUBtn;	  //ボタンの画像
-IMAGE ImageMENUBK;	  //ゲームの背景(説明画面)
-IMAGE ImageEndClear;  //クリアの画像
-IMAGE ImageEndOver;   //失敗の画像
-IMAGE_MENU ImageMENU1;	  //操作説明の1枚目
-IMAGE_MENU ImageMENU2;     //操作説明の2枚目
+IMAGE ImageSTARTBK;		//ゲームの背景(スタート画面)
+IMAGE ImagePLAYENDBK;	//ゲームの背景(プレイ・エンド画面)
+IMAGE ImageMENUBtn;		//ボタンの画像
+IMAGE ImageMENUBK;		//ゲームの背景(説明画面)
+IMAGE ImageEndClear;	//クリアの画像
+IMAGE ImageEndFail;		//失敗の画像
+IMAGE_MENU ImageMENU1;	//操作説明の1枚目
+IMAGE_MENU ImageMENU2;  //操作説明の2枚目
+IMAGE ImageMessage1;	//お客様からのメッセージ(成功パターン)
+IMAGE ImageMessage2;    //お客様からのメッセージ(失敗パターン)
 
 //フォント
 FONT TANUKI;
@@ -692,10 +696,12 @@ VOID MY_END_DRAW(VOID)
 	{
 	case JUDE_CLEAR:
 		DrawGraph(ImageEndClear.x, ImageEndClear.y, ImageEndClear.handle, TRUE);
+		DrawGraph(ImageMessage1.x, ImageMessage1.y, ImageMessage1.handle, TRUE);
 		break;
 
 	case JUDE_OVER:
-		DrawGraph(ImageEndOver.x, ImageEndOver.y, ImageEndOver.handle, TRUE);
+		DrawGraph(ImageEndFail.x, ImageEndFail.y, ImageEndFail.handle, TRUE);
+		DrawGraph(ImageMessage2.x, ImageMessage2.y, ImageMessage2.handle, TRUE);
 		break;
 	}
 
@@ -800,20 +806,20 @@ BOOL MY_LOAD_IMAGE(VOID)
 	}
 	GetGraphSize(ImageEndClear.handle, &ImageEndClear.width, &ImageEndClear.height);
 	ImageEndClear.x = GAME_WIDTH / 2 - ImageEndClear.width / 2;
-	ImageEndClear.y = GAME_HEIGHT / 2 - ImageEndClear.height / 2;
+	ImageEndClear.y = GAME_HEIGHT / 2 - ImageEndClear.height / 2 - 75;
 
 	//失敗の画像
-	strcpy_s(ImageEndOver.path, IMAGE_END_OVER_PATH);  //パスの設定
-	ImageEndOver.handle = LoadGraph(ImageEndOver.path);   //読み込み
-	if (ImageEndOver.handle == -1)
+	strcpy_s(ImageEndFail.path, IMAGE_END_FAIL_PATH);  //パスの設定
+	ImageEndFail.handle = LoadGraph(ImageEndFail.path);   //読み込み
+	if (ImageEndFail.handle == -1)
 	{
 		//エラーメッセージ表示
-		MessageBox(GetMainWindowHandle(), IMAGE_END_OVER_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		MessageBox(GetMainWindowHandle(), IMAGE_END_FAIL_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(ImageEndOver.handle, &ImageEndOver.width, &ImageEndOver.height);
-	ImageEndOver.x = GAME_WIDTH / 2 - ImageEndOver.width / 2;
-	ImageEndOver.y = GAME_HEIGHT / 2 - ImageEndOver.height / 2;
+	GetGraphSize(ImageEndFail.handle, &ImageEndFail.width, &ImageEndFail.height);
+	ImageEndFail.x = GAME_WIDTH / 2 - ImageEndFail.width / 2;
+	ImageEndFail.y = GAME_HEIGHT / 2 - ImageEndFail.height / 2 - 75;
 
 	//操作説明の1枚目の背景
 	strcpy_s(ImageMENU1.image.path, IMAGE_MENU_1_PATH);  //パスの設定
@@ -843,27 +849,61 @@ BOOL MY_LOAD_IMAGE(VOID)
 	ImageMENU2.image.y = 0;
 	ImageMENU2.IsDraw = FALSE;
 
+	//お客様からのメッセージ(成功パターン)
+	strcpy_s(ImageMessage1.path, IMAGE_MESSAGE_1_PATH);  //パスの設定
+	ImageMessage1.handle = LoadGraph(ImageMessage1.path);   //読み込み
+	if (ImageMessage1.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), IMAGE_MESSAGE_1_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImageMessage1.handle, &ImageMessage1.width, &ImageMessage1.height);
+	ImageMessage1.x = GAME_WIDTH / 2 - ImageMessage1.width / 2;
+	ImageMessage1.y = ImageEndClear.y + ImageEndClear.height;
+
+	//お客様からのメッセージ(失敗パターン)
+	strcpy_s(ImageMessage2.path, IMAGE_MESSAGE_2_PATH);  //パスの設定
+	ImageMessage2.handle = LoadGraph(ImageMessage2.path);   //読み込み
+	if (ImageMessage2.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), IMAGE_MESSAGE_2_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImageMessage2.handle, &ImageMessage2.width, &ImageMessage2.height);
+	ImageMessage2.x = GAME_WIDTH / 2 - ImageMessage2.width / 2;
+	ImageMessage2.y = ImageEndFail.y + ImageEndFail.height;
+
 	return TRUE;
 }
 
 //画像をまとめて削除する関数
 VOID MY_DELETE_IMAGE(VOID)
 {
+	//背景の画像
 	DeleteGraph(ImageSTARTBK.handle);
 	DeleteGraph(ImagePLAYENDBK.handle);
 	DeleteGraph(ImageMENUBtn.handle);
 	DeleteGraph(ImageMENUBK.handle);
 
+	//動物チップ
 	for (int i_num = 0; i_num < CHIP_DIV_NUM; i_num++)
 	{
 		DeleteGraph(animal[0].handle[i_num]);
 	}
 
+	//成功・失敗の画像
 	DeleteGraph(ImageEndClear.handle);
-	DeleteGraph(ImageEndOver.handle);
+	DeleteGraph(ImageEndFail.handle);
 
+	//操作説明の画像
 	DeleteGraph(ImageMENU1.image.handle);
 	DeleteGraph(ImageMENU2.image.handle);
+
+	//メッセージの画像
+	DeleteGraph(ImageMessage1.handle);
+	DeleteGraph(ImageMessage2.handle);
 
 	return;
 }
