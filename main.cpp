@@ -858,7 +858,7 @@ BOOL MY_FONT_CREATE(VOID)
 	strcpy_s(TANUKI.path, sizeof(TANUKI.path), FONT_TANUKI_PATH);  //パスをコピー
 	strcpy_s(TANUKI.name, sizeof(TANUKI.name), FONT_TANUKI_NAME);  //フォント名をコピー
 	TANUKI.handle = -1;							//ハンドルを初期化
-	TANUKI.size = 50;								//サイズ: 50
+	TANUKI.size = 40;								//サイズ: 50
 	TANUKI.bold = 4;								//太さ: 4
 	TANUKI.type = DX_FONTTYPE_ANTIALIASING_EDGE;   //アンチエイリアシング付き
 
