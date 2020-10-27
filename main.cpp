@@ -28,6 +28,8 @@
 #define IMAGE_MENU_BK_PATH      TEXT(".\\IMAGE\\menu_背景.png")		//背景(操作説明画面)の画像
 #define IMAGE_END_CLEAR_PATH	TEXT(".\\IMAGE\\GameClear.png")		//クリアの画像
 #define IMAGE_END_OVER_PATH		TEXT(".\\IMAGE\\sippai.png")		//ゲームオーバーの画像
+#define IMAGE_MENU_1_PATH		TEXT(".\\IMAGE\\操作説明-1.png")	//操作説明の1枚目
+#define IMAGE_MENU_2_PATH		TEXT(".\\IMAGE\\操作説明-2.png")	//操作説明の2枚目
 
 //動物チップ関連
 #define GAME_animal1_CHIP_PATH  TEXT(".\\IMAGE\\animal\\mapchip_1.png")  //チップの画像
@@ -86,6 +88,12 @@ typedef struct STRUCT_IMAGE
 	int height;				//高さ
 }IMAGE; //画像構造体
 
+typedef struct STRCT_MENU_IMAGE
+{
+	IMAGE image;
+	BOOL IsDraw;
+}IMAGE_MENU;
+
 typedef struct STRUCT_ANIMAL
 {
 	char path[PATH_MAX];		//パス
@@ -140,10 +148,12 @@ BOOL First_flg = TRUE;
 //画像関連
 IMAGE ImageSTARTBK;   //ゲームの背景(スタート画面)
 IMAGE ImagePLAYENDBK; //ゲームの背景(プレイ・エンド画面)
-IMAGE ImageMENU;	  //ボタンの画像
+IMAGE ImageMENUBtn;	  //ボタンの画像
 IMAGE ImageMENUBK;	  //ゲームの背景(説明画面)
 IMAGE ImageEndClear;  //クリアの画像
 IMAGE ImageEndOver;   //失敗の画像
+IMAGE_MENU ImageMENU1;	  //操作説明の1枚目
+IMAGE_MENU ImageMENU2;     //操作説明の2枚目
 
 //フォント
 FONT TANUKI;
@@ -387,7 +397,7 @@ BOOL MY_KEYDOWN_KEEP(int KEY_INPUT_, int DownTime)
 	}
 }
 
-//動物の画像変更用
+//動物の画像変更用・操作説明画面用
 BOOL MY_KEYDOWN_1SECOND(int KEY_INPUT_)
 {
 	//キーコードのキーを押している時
@@ -437,7 +447,7 @@ VOID MY_START_DRAW(VOID)
 	DrawGraph(ImageSTARTBK.x, ImageSTARTBK.y, ImageSTARTBK.handle, TRUE);
 
 	//操作説明画面
-	DrawGraph(ImageMENU.x, ImageMENU.y, ImageMENU.handle, TRUE);
+	DrawGraph(ImageMENUBtn.x, ImageMENUBtn.y, ImageMENUBtn.handle, TRUE);
 
 	return;
 }
@@ -459,6 +469,18 @@ VOID MY_MENU_PROC(VOID)
 		GameScene = GAME_SCENE_START;
 	}
 
+	if (MY_KEYDOWN_1SECOND(KEY_INPUT_RETURN) == TRUE)
+	{
+		if (ImageMENU1.IsDraw == TRUE) {
+			ImageMENU1.IsDraw = FALSE;
+			ImageMENU2.IsDraw = TRUE;
+		}
+		else {
+			ImageMENU1.IsDraw = TRUE;
+			ImageMENU2.IsDraw = FALSE;
+		}
+	}
+
 	return;
 }
 
@@ -466,6 +488,11 @@ VOID MY_MENU_PROC(VOID)
 VOID MY_MENU_DRAW(VOID)
 {
 	DrawGraph(ImageMENUBK.x, ImageMENUBK.y, ImageMENUBK.handle, TRUE);
+
+	if(ImageMENU1.IsDraw == TRUE)
+		DrawGraph(ImageMENU1.image.x, ImageMENU1.image.y, ImageMENU1.image.handle, TRUE);
+	if(ImageMENU2.IsDraw == TRUE)
+		DrawGraph(ImageMENU2.image.x, ImageMENU2.image.y, ImageMENU2.image.handle, TRUE);
 	return;
 }
 
@@ -503,19 +530,19 @@ VOID MY_PLAY_PROC(VOID)
 			}*/
 
 			//▼▼▼▼▼考える時間が一定時間過ぎるとゲームオーバー(修正箇所多々残留)▼▼▼▼▼
-			ElaTime = (TimeLimit - (GetNowCount() - StartTime) / 1000);
+			//ElaTime = (TimeLimit - (GetNowCount() - StartTime) / 1000);
 
-			if (ElaTime <= 0)
-			{
-				Jude = JUDE_OVER;
+			//if (ElaTime <= 0)
+			//{
+			//	Jude = JUDE_OVER;
 
-				GameScene = GAME_SCENE_END;
+			//	GameScene = GAME_SCENE_END;
 
-				//画像の消去・初期化
-				MY_PICTURE_INIT();
+			//	//画像の消去・初期化
+			//	MY_PICTURE_INIT();
 
-				return;
-			}
+			//	return;
+			//}
 			//▲▲▲▲▲
 
 			Mask_sum += Mask_num;
@@ -705,17 +732,17 @@ BOOL MY_LOAD_IMAGE(VOID)
 	ImagePLAYENDBK.y = GAME_HEIGHT / 2 - ImagePLAYENDBK.height / 2;
 
 	//操作説明画面へ促すためのボタン
-	strcpy_s(ImageMENU.path, IMAGE_MENU_IMAGE_PATH);  //パスの設定
-	ImageMENU.handle = LoadGraph(ImageMENU.path);   //読み込み
-	if (ImageMENU.handle == -1)
+	strcpy_s(ImageMENUBtn.path, IMAGE_MENU_IMAGE_PATH);  //パスの設定
+	ImageMENUBtn.handle = LoadGraph(ImageMENUBtn.path);   //読み込み
+	if (ImageMENUBtn.handle == -1)
 	{
 		//エラーメッセージ表示
 		MessageBox(GetMainWindowHandle(), IMAGE_MENU_IMAGE_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(ImageMENU.handle, &ImageMENU.width, &ImageMENU.height);
-	ImageMENU.x = GAME_WIDTH - ImageMENU.width - 20;
-	ImageMENU.y = GAME_HEIGHT - ImageMENU.height - 20;
+	GetGraphSize(ImageMENUBtn.handle, &ImageMENUBtn.width, &ImageMENUBtn.height);
+	ImageMENUBtn.x = GAME_WIDTH - ImageMENUBtn.width - 20;
+	ImageMENUBtn.y = GAME_HEIGHT - ImageMENUBtn.height - 20;
 
 	//操作説明画面の背景
 	strcpy_s(ImageMENUBK.path, IMAGE_MENU_BK_PATH);  //パスの設定
@@ -788,6 +815,34 @@ BOOL MY_LOAD_IMAGE(VOID)
 	ImageEndOver.x = GAME_WIDTH / 2 - ImageEndOver.width / 2;
 	ImageEndOver.y = GAME_HEIGHT / 2 - ImageEndOver.height / 2;
 
+	//操作説明の1枚目の背景
+	strcpy_s(ImageMENU1.image.path, IMAGE_MENU_1_PATH);  //パスの設定
+	ImageMENU1.image.handle = LoadGraph(ImageMENU1.image.path);   //読み込み
+	if (ImageMENU1.image.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), IMAGE_MENU_1_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImageMENU1.image.handle, &ImageMENU1.image.width, &ImageMENU1.image.height);
+	ImageMENU1.image.x = 0;
+	ImageMENU1.image.y = 0;
+	ImageMENU1.IsDraw = TRUE;
+
+	//操作説明の2枚目の背景
+	strcpy_s(ImageMENU2.image.path, IMAGE_MENU_2_PATH);  //パスの設定
+	ImageMENU2.image.handle = LoadGraph(ImageMENU2.image.path);   //読み込み
+	if (ImageMENU2.image.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), IMAGE_MENU_2_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImageMENU2.image.handle, &ImageMENU2.image.width, &ImageMENU2.image.height);
+	ImageMENU2.image.x = 0;
+	ImageMENU2.image.y = 0;
+	ImageMENU2.IsDraw = FALSE;
+
 	return TRUE;
 }
 
@@ -796,7 +851,7 @@ VOID MY_DELETE_IMAGE(VOID)
 {
 	DeleteGraph(ImageSTARTBK.handle);
 	DeleteGraph(ImagePLAYENDBK.handle);
-	DeleteGraph(ImageMENU.handle);
+	DeleteGraph(ImageMENUBtn.handle);
 	DeleteGraph(ImageMENUBK.handle);
 
 	for (int i_num = 0; i_num < CHIP_DIV_NUM; i_num++)
@@ -806,6 +861,9 @@ VOID MY_DELETE_IMAGE(VOID)
 
 	DeleteGraph(ImageEndClear.handle);
 	DeleteGraph(ImageEndOver.handle);
+
+	DeleteGraph(ImageMENU1.image.handle);
+	DeleteGraph(ImageMENU2.image.handle);
 
 	return;
 }
@@ -858,7 +916,7 @@ BOOL MY_FONT_CREATE(VOID)
 	strcpy_s(TANUKI.path, sizeof(TANUKI.path), FONT_TANUKI_PATH);  //パスをコピー
 	strcpy_s(TANUKI.name, sizeof(TANUKI.name), FONT_TANUKI_NAME);  //フォント名をコピー
 	TANUKI.handle = -1;							//ハンドルを初期化
-	TANUKI.size = 40;								//サイズ: 50
+	TANUKI.size = 50;								//サイズ: 50
 	TANUKI.bold = 4;								//太さ: 4
 	TANUKI.type = DX_FONTTYPE_ANTIALIASING_EDGE;   //アンチエイリアシング付き
 
