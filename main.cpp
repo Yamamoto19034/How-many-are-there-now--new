@@ -60,6 +60,15 @@
 #define FONT_INSTALL_ERR_TITLE	TEXT("フォントインストールエラー")
 #define FONT_CREATE_ERR_TITLE	TEXT("フォント作成エラー")
 
+//音楽のパス
+#define MUSIC_START_BGM_PATH	TEXT(".\\MUSIC\\game_maoudamashii_7_event43.mp3")  //スタート画面のBGM
+#define MUSIC_PLAY_BGM_PATH		TEXT(".\\MUSIC\\game_maoudamashii_7_event34.mp3")  //プレイ画面のBGM
+#define MUSIC_END_CLEAR_PATH	TEXT(".\\MUSIC\\game_maoudamashii_7_event42.mp3")  //エンド画面(クリアパターン)の音楽
+#define MUSIC_END_FAIL_PATH		TEXT(".\\MUSIC\\game_maoudamashii_8_orgel05.mp3")  //エンド画面(失敗パターン)の音楽
+
+//エラーメッセージ
+#define MUSIC_LOAD_ERR_TITLE	TEXT("音楽読み込みエラー")
+
 #define GAME_TIME				5
 
 enum GAME_SCENE {
@@ -117,6 +126,12 @@ typedef struct STRUCT_FONT
 	int type;					//タイプ
 }FONT;
 
+typedef struct STRUCT_MUSIC
+{
+	char path[PATH_MAX];		//パス
+	int handle;					//ハンドル
+}MUSIC;  //音楽構造体
+
 //グローバル変数
 int StartTimeFps;				//測定開始時刻
 int CountFps;					//カウンタ
@@ -165,6 +180,12 @@ FONT TANUKI;
 //クリアか失敗か
 int Jude;
 
+//音楽関連
+MUSIC START_BGM;		//スタート画面のBGM
+MUSIC PLAY_BGM;			//プレイ画面のBGM
+MUSIC END_CLEAR_BGM;	//エンド画面(クリアパターン)のBGM
+MUSIC END_FAIL_BGM;		//エンド画面(失敗パターン)のBGM
+
 //プロトタイプ宣言
 VOID MY_FPS_UPDATE(VOID);		//FPS値を計測、更新する関数
 VOID MY_FPS_DRAW(VOID);			//FPS値を描画する関数
@@ -201,6 +222,9 @@ VOID MY_FONT_UNINSTALL_ONCE(VOID);  //フォントを一時的にアンインストール
 BOOL MY_FONT_CREATE(VOID);			//フォントを作成する
 VOID MY_FONT_DELETE(VOID);			//フォントを削除する
 
+BOOL MY_LOAD_MUSIC(VOID);			//音楽をまとめて読み込む関数
+VOID MY_DELETE_MUSIC(VOID);			//音楽をまとめて削除する関数
+
 //########## プログラムで最初に実行される関数 ##########
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -221,6 +245,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	//画像を読み込む
 	if (MY_LOAD_IMAGE() == FALSE) { return -1; }
+
+	//音楽を読み込む
+	if (MY_LOAD_MUSIC() == FALSE) { return -1; }
 
 	GameScene = GAME_SCENE_START;   //ゲームシーンはスタート画面から
 
@@ -276,6 +303,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	//一時的にインストールしたフォントをアンインストール
 	MY_FONT_UNINSTALL_ONCE();
+
+	//音楽ハンドルを破棄
+	MY_DELETE_MUSIC();
 
 	DxLib_End();	//ＤＸライブラリ使用の終了処理
 
@@ -427,12 +457,26 @@ VOID MY_START(VOID)
 //スタート画面の処理
 VOID MY_START_PROC(VOID)
 {
+	//BGMが流れていないなら
+	if (CheckSoundMem(START_BGM.handle) == 0)
+	{
+		//BGMの音量を下げる
+		ChangeVolumeSoundMem(255 * 50 / 100, START_BGM.handle);  //50%の音量にする
+		PlaySoundMem(START_BGM.handle, DX_PLAYTYPE_LOOP);
+	}
+
 	//エンターキーを押したら、プレイシーンへ移動する
 	if (MY_KEY_DOWN(KEY_INPUT_RETURN) == TRUE)
 	{
 		HaveMask = EASY_HAVE_MASK;
 		GiveMask = EASY_GIVE_MASK_RANGE;
 		GameScene = GAME_SCENE_PLAY;
+
+		//BGMが流れているなら
+		if (CheckSoundMem(START_BGM.handle) != 0)
+		{
+			StopSoundMem(START_BGM.handle);   //BGMを止める
+		}
 	}
 
 	//シフトキー(左シフトキー or 右シフトキー)を押したら、操作説明画面に移動する
@@ -549,6 +593,14 @@ VOID MY_PLAY_PROC(VOID)
 			//}
 			//▲▲▲▲▲
 
+			//BGMが流れていないなら
+			if (CheckSoundMem(PLAY_BGM.handle) == 0)
+			{
+				//BGMの音量を下げる
+				ChangeVolumeSoundMem(255 * 50 / 100, PLAY_BGM.handle);  //50%の音量にする
+				PlaySoundMem(PLAY_BGM.handle, DX_PLAYTYPE_LOOP);
+			}
+
 			Mask_sum += Mask_num;
 
 			//乱数を取得
@@ -563,6 +615,12 @@ VOID MY_PLAY_PROC(VOID)
 
 				//画像の消去・初期化
 				MY_PICTURE_INIT();
+
+				//BGMが流れているなら
+				if (CheckSoundMem(PLAY_BGM.handle) != 0)
+				{
+					StopSoundMem(PLAY_BGM.handle);   //BGMを止める
+				}
 
 				return;
 			}
@@ -594,7 +652,7 @@ VOID MY_PLAY_PROC(VOID)
 		if (MY_KEYDOWN_1SECOND(KEY_INPUT_DELETE) == TRUE)
 		{
 			//成功パターン
-			if ((Mask_sum + Mask_num) > HaveMask)
+			if ((Mask_sum + Mask_num) >= HaveMask)
 			{
 				Jude = JUDE_CLEAR;
 
@@ -602,6 +660,12 @@ VOID MY_PLAY_PROC(VOID)
 
 				//画像の消去・初期化
 				MY_PICTURE_INIT();
+
+				//BGMが流れているなら
+				if (CheckSoundMem(PLAY_BGM.handle) != 0)
+				{
+					StopSoundMem(PLAY_BGM.handle);   //BGMを止める
+				}
 
 				return;
 			}
@@ -614,6 +678,12 @@ VOID MY_PLAY_PROC(VOID)
 
 				//画像の消去・初期化
 				MY_PICTURE_INIT();
+
+				//BGMが流れているなら
+				if (CheckSoundMem(PLAY_BGM.handle) != 0)
+				{
+					StopSoundMem(PLAY_BGM.handle);   //BGMを止める
+				}
 
 				return;
 			}
@@ -629,7 +699,7 @@ VOID MY_PLAY_DRAW(VOID)
 	//プレイ画面の背景
 	DrawGraph(ImagePLAYENDBK.x, ImagePLAYENDBK.y, ImagePLAYENDBK.handle, TRUE);
 
-	DrawFormatStringToHandle(0, 200, GetColor(255, 255, 255), TANUKI.handle, "%dミリ秒", ElaTime);
+	//DrawFormatStringToHandle(0, 200, GetColor(255, 255, 255), TANUKI.handle, "%dミリ秒", ElaTime);
 	//DrawFormatStringToHandle(0, 200, GetColor(255, 255, 255), TANUKI.handle, "%dミリ秒", StartTime);
 
 	//トークシーンの背景
@@ -677,13 +747,50 @@ VOID MY_END(VOID)
 //エンド画面の処理
 VOID MY_END_PROC(VOID)
 {
+	switch (Jude)
+	{
+	//クリアパターン
+	case JUDE_CLEAR:
+		//BGMが流れていないなら
+		if (CheckSoundMem(END_CLEAR_BGM.handle) == 0)
+		{
+			//BGMの音量を下げる
+			ChangeVolumeSoundMem(255 * 50 / 100, END_CLEAR_BGM.handle);  //50%の音量にする
+			PlaySoundMem(END_CLEAR_BGM.handle, DX_PLAYTYPE_LOOP);
+		}
+		break;
+
+	//失敗パターン
+	case JUDE_OVER:
+		//BGMが流れていないなら
+		if (CheckSoundMem(END_FAIL_BGM.handle) == 0)
+		{
+			//BGMの音量を下げる
+			ChangeVolumeSoundMem(255 * 50 / 100, END_FAIL_BGM.handle);  //50%の音量にする
+			PlaySoundMem(END_FAIL_BGM.handle, DX_PLAYTYPE_LOOP);
+		}
+		break;
+	}
+
 	//エスケープキーを押したら、スタートシーンへ移動する
 	if (MY_KEY_DOWN(KEY_INPUT_BACK) == TRUE)
 	{
 		HaveMask = 0;
 		GiveMask = 0;
 		GameScene = GAME_SCENE_START;
+
+		//BGMが流れているなら(クリアパターン)
+		if (CheckSoundMem(END_CLEAR_BGM.handle) != 0)
+		{
+			StopSoundMem(END_CLEAR_BGM.handle);   //BGMを止める
+		}
+		//BGMが流れているなら(失敗パターン)
+		if (CheckSoundMem(END_FAIL_BGM.handle) != 0)
+		{
+			StopSoundMem(END_FAIL_BGM.handle);   //BGMを止める
+		}
 	}
+
 	return;
 }
 
@@ -694,11 +801,13 @@ VOID MY_END_DRAW(VOID)
 
 	switch (Jude)
 	{
+	//クリアパターン
 	case JUDE_CLEAR:
 		DrawGraph(ImageEndClear.x, ImageEndClear.y, ImageEndClear.handle, TRUE);
 		DrawGraph(ImageMessage1.x, ImageMessage1.y, ImageMessage1.handle, TRUE);
 		break;
 
+	//失敗パターン
 	case JUDE_OVER:
 		DrawGraph(ImageEndFail.x, ImageEndFail.y, ImageEndFail.handle, TRUE);
 		DrawGraph(ImageMessage2.x, ImageMessage2.y, ImageMessage2.handle, TRUE);
@@ -973,6 +1082,61 @@ VOID MY_FONT_DELETE(VOID)
 {
 	//フォントデータを削除
 	DeleteFontToHandle(TANUKI.handle);
+
+	return;
+}
+
+//音楽をまとめて読み込む関数
+BOOL MY_LOAD_MUSIC(VOID)
+{
+	//スタート画面の音楽
+	strcpy_s(START_BGM.path, MUSIC_START_BGM_PATH);
+	START_BGM.handle = LoadSoundMem(START_BGM.path);
+	if (START_BGM.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), MUSIC_START_BGM_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+
+	//プレイ画面の音楽
+	strcpy_s(PLAY_BGM.path, MUSIC_PLAY_BGM_PATH);
+	PLAY_BGM.handle = LoadSoundMem(PLAY_BGM.path);
+	if (PLAY_BGM.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), MUSIC_PLAY_BGM_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+
+	//エンド画面(クリアパターン)の音楽
+	strcpy_s(END_CLEAR_BGM.path, MUSIC_END_CLEAR_PATH);
+	END_CLEAR_BGM.handle = LoadSoundMem(END_CLEAR_BGM.path);
+	if (END_CLEAR_BGM.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), MUSIC_END_CLEAR_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+
+	//エンド画面(失敗パターン)の音楽
+	strcpy_s(END_FAIL_BGM.path, MUSIC_END_FAIL_PATH);
+	END_FAIL_BGM.handle = LoadSoundMem(END_FAIL_BGM.path);
+	if (END_FAIL_BGM.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), MUSIC_END_FAIL_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+//音楽をまとめて削除する関数
+VOID MY_DELETE_MUSIC(VOID)
+{
+	DeleteSoundMem(START_BGM.handle);
+	DeleteSoundMem(PLAY_BGM.handle);
 
 	return;
 }
