@@ -6,10 +6,10 @@
 
 //########## マクロ定義 ##########
 #define GAME_WIDTH	1000	//画面の横の大きさ
-#define GAME_HEIGHT	700	//画面の縦の大きさ
-#define GAME_COLOR	32	//画面のカラービット
+#define GAME_HEIGHT	700		//画面の縦の大きさ
+#define GAME_COLOR	32		//画面のカラービット
 
-#define GAME_WINDOW_BAR	0	//タイトルバーはデフォルトにする
+#define GAME_WINDOW_BAR	0					//タイトルバーはデフォルトにする
 #define GAME_WINDOW_NAME	"GAME TITLE"	//ウィンドウのタイトル
 
 #define GAME_FPS	60  //FPSの数値
@@ -36,7 +36,6 @@
 //動物チップ関連
 #define GAME_animal1_CHIP_PATH  TEXT(".\\IMAGE\\animal\\mapchip_1.png")  //チップの画像
 #define ANIMAL_MAX				4
-#define ANIMAL_CHANGE_MAX		6
 
 //画像分割関連
 #define CHIP_DIV_WIDTH			565   //画像を分割する幅サイズ
@@ -46,8 +45,8 @@
 #define CHIP_DIV_NUM GAME_animal1_DIV_TATE * GAME_animal1_DIV_YOKO  //画像を分割する総数
 
 //マスク関連
-#define EASY_HAVE_MASK				20
-#define EASY_GIVE_MASK_RANGE		5
+#define EASY_HAVE_MASK				20		//マスクの上限(Easyモード)
+#define EASY_GIVE_MASK_RANGE		5		//マスクのランダム数(Easyモード)
 
 //フォントのパスの長さ
 #define FONT_PATH_MAX			255
@@ -72,22 +71,16 @@
 #define GAME_TIME				5
 
 enum GAME_SCENE {
-	GAME_SCENE_START,
-	GAME_SCENE_PLAY,
-	GAME_SCENE_END,
-	GAME_SCENE_MENU
+	GAME_SCENE_START,  //スタート画面
+	GAME_SCENE_PLAY,   //プレイ画面
+	GAME_SCENE_END,    //エンド画面
+	GAME_SCENE_MENU    //操作説明画面
 };   //ゲームのシーン
 
 enum GAME_JUDE {
 	JUDE_CLEAR,  //成功
 	JUDE_OVER    //失敗
 };  //クリアか失敗か
-
-typedef struct STRUCT_I_POINT
-{
-	int x = -1;
-	int y = -1;
-}iPOINT;
 
 typedef struct STRUCT_IMAGE
 {
@@ -101,9 +94,9 @@ typedef struct STRUCT_IMAGE
 
 typedef struct STRCT_MENU_IMAGE
 {
-	IMAGE image;
-	BOOL IsDraw;
-}IMAGE_MENU;
+	IMAGE image;  //画像構造体
+	BOOL IsDraw;  //描画できるか否か
+}IMAGE_MENU;  //操作説明画面用
 
 typedef struct STRUCT_ANIMAL
 {
@@ -114,7 +107,7 @@ typedef struct STRUCT_ANIMAL
 	int width;					//幅
 	int height;					//高さ
 	BOOL IsDraw;				//動物を表示できるか
-}MAPCHIP;
+}MAPCHIP;  //マップチップ構造体
 
 typedef struct STRUCT_FONT
 {
@@ -124,7 +117,7 @@ typedef struct STRUCT_FONT
 	int size;					//大きさ
 	int bold;					//太さ
 	int type;					//タイプ
-}FONT;
+}FONT;   //フォント構造体
 
 typedef struct STRUCT_MUSIC
 {
@@ -148,13 +141,13 @@ int GameScene;
 //マップチップ関連
 MAPCHIP animal[ANIMAL_MAX];
 int GHandle[ANIMAL_MAX];
-int order = 0;
+int order = 0;  //表示する順番を管理
 
 //マスク関連
-int Mask_num = 0;
-int Mask_sum = 0;
-int HaveMask = 0;
-int GiveMask = 0;
+int Mask_num = 0;   //あげるマスクの個数
+int Mask_sum = 0;   //マスクの合計値
+int HaveMask = 0;   //各モードの上限マスク個数
+int GiveMask = 0;   //あげるマスクのランダム数
 
 //時間関連
 double StartTime = 0;		//計測開始時間
@@ -283,17 +276,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			break;
 		}
 
-		//DrawString(DrawX, DrawY, "Hello World", GetColor(255, 255, 255));	//文字を描画
-
 		MY_FPS_DRAW();	   //FPSの処理(描画)
 
 		ScreenFlip();		//モニタのリフレッシュレートの速さで裏画面を再描画
 
 		MY_FPS_WAIT();     //FPSの処理(待つ)
 	}
-
-	//DrawString(DrawX, DrawY, "Hello World", GetColor(255, 255, 255));	//文字を描画
-	//WaitKey();	//キー入力待ち
 
 	//画像ハンドルを破棄
 	MY_DELETE_IMAGE();
@@ -468,8 +456,9 @@ VOID MY_START_PROC(VOID)
 	//エンターキーを押したら、プレイシーンへ移動する
 	if (MY_KEY_DOWN(KEY_INPUT_RETURN) == TRUE)
 	{
-		HaveMask = EASY_HAVE_MASK;
-		GiveMask = EASY_GIVE_MASK_RANGE;
+		//プレイ画面に向けて準備
+		HaveMask = EASY_HAVE_MASK;			//マスクの上限個数の設定
+		GiveMask = EASY_GIVE_MASK_RANGE;	//上げるマスクのランダム数の設定
 		GameScene = GAME_SCENE_PLAY;
 
 		//BGMが流れているなら
@@ -494,7 +483,7 @@ VOID MY_START_DRAW(VOID)
 	//背景を描画する
 	DrawGraph(ImageSTARTBK.x, ImageSTARTBK.y, ImageSTARTBK.handle, TRUE);
 
-	//操作説明画面
+	//操作説明画面へ促すボタン
 	DrawGraph(ImageMENUBtn.x, ImageMENUBtn.y, ImageMENUBtn.handle, TRUE);
 
 	return;
@@ -514,18 +503,20 @@ VOID MY_MENU_PROC(VOID)
 {
 	if (MY_KEY_DOWN(KEY_INPUT_BACK) == TRUE)
 	{
+		//スタート画面に戻る
 		GameScene = GAME_SCENE_START;
 	}
 
+	//2つの説明画像を交互に切り替え
 	if (MY_KEYDOWN_1SECOND(KEY_INPUT_RETURN) == TRUE)
 	{
 		if (ImageMENU1.IsDraw == TRUE) {
-			ImageMENU1.IsDraw = FALSE;
-			ImageMENU2.IsDraw = TRUE;
+			ImageMENU1.IsDraw = FALSE;	//消去
+			ImageMENU2.IsDraw = TRUE;	//表示
 		}
 		else {
-			ImageMENU1.IsDraw = TRUE;
-			ImageMENU2.IsDraw = FALSE;
+			ImageMENU1.IsDraw = TRUE;	//表示
+			ImageMENU2.IsDraw = FALSE;	//消去
 		}
 	}
 
@@ -535,11 +526,12 @@ VOID MY_MENU_PROC(VOID)
 //操作説明画面の描画
 VOID MY_MENU_DRAW(VOID)
 {
+	//背景を描画する
 	DrawGraph(ImageMENUBK.x, ImageMENUBK.y, ImageMENUBK.handle, TRUE);
 
-	if(ImageMENU1.IsDraw == TRUE)
+	if(ImageMENU1.IsDraw == TRUE)  //説明画像の1枚目
 		DrawGraph(ImageMENU1.image.x, ImageMENU1.image.y, ImageMENU1.image.handle, TRUE);
-	if(ImageMENU2.IsDraw == TRUE)
+	if(ImageMENU2.IsDraw == TRUE)  //説明画像の2枚目
 		DrawGraph(ImageMENU2.image.x, ImageMENU2.image.y, ImageMENU2.image.handle, TRUE);
 	return;
 }
@@ -565,7 +557,7 @@ VOID MY_PLAY_PROC(VOID)
 
 	else
 	{
-		//エンターキーを押したら
+		//エンターキーを押す際の行動パターン(マスクを「あげる」)
 		if (MY_KEYDOWN_1SECOND(KEY_INPUT_RETURN) == TRUE)
 		{
 			//ElaTime = GetNowCount();
@@ -601,6 +593,7 @@ VOID MY_PLAY_PROC(VOID)
 				PlaySoundMem(PLAY_BGM.handle, DX_PLAYTYPE_LOOP);
 			}
 
+			//加算していく
 			Mask_sum += Mask_num;
 
 			//乱数を取得
@@ -609,9 +602,9 @@ VOID MY_PLAY_PROC(VOID)
 			//一定量を超えたら終了
 			if (Mask_sum > HaveMask)
 			{
-				Jude = JUDE_OVER;
+				Jude = JUDE_OVER;  //判定は「失敗」
 
-				GameScene = GAME_SCENE_END;
+				GameScene = GAME_SCENE_END;  //エンド画面に移動
 
 				//画像の消去・初期化
 				MY_PICTURE_INIT();
@@ -638,7 +631,7 @@ VOID MY_PLAY_PROC(VOID)
 				//描画
 				animal[order - 1].IsDraw = FALSE;		//一個前の絵を消す
 				animal[order].IsDraw = TRUE;			//表示
-				order = 0;
+				order = 0;								//最初から
 			}
 			else
 			{
@@ -649,14 +642,15 @@ VOID MY_PLAY_PROC(VOID)
 			}
 		}
 
+		//デリートーキーを押す際の行動パターン(マスクを「あげない」)
 		if (MY_KEYDOWN_1SECOND(KEY_INPUT_DELETE) == TRUE)
 		{
 			//成功パターン
 			if ((Mask_sum + Mask_num) >= HaveMask)
 			{
-				Jude = JUDE_CLEAR;
+				Jude = JUDE_CLEAR;  //判定は「失敗」
 
-				GameScene = GAME_SCENE_END;
+				GameScene = GAME_SCENE_END;  //エンド画面に移動
 
 				//画像の消去・初期化
 				MY_PICTURE_INIT();
@@ -672,9 +666,9 @@ VOID MY_PLAY_PROC(VOID)
 			//失敗パターン
 			else if ((Mask_sum + Mask_num) < HaveMask)
 			{
-				Jude = JUDE_OVER;
+				Jude = JUDE_OVER;  //判定は「失敗」
 
-				GameScene = GAME_SCENE_END;
+				GameScene = GAME_SCENE_END;  //エンド画面に移動
 
 				//画像の消去・初期化
 				MY_PICTURE_INIT();
@@ -772,12 +766,12 @@ VOID MY_END_PROC(VOID)
 		break;
 	}
 
-	//エスケープキーを押したら、スタートシーンへ移動する
+	//バックスペースキーを押したら、スタートシーンへ移動する
 	if (MY_KEY_DOWN(KEY_INPUT_BACK) == TRUE)
 	{
-		HaveMask = 0;
-		GiveMask = 0;
-		GameScene = GAME_SCENE_START;
+		HaveMask = 0;					//初期化
+		GiveMask = 0;					//初期化
+		GameScene = GAME_SCENE_START;   //スタート画面に移動
 
 		//BGMが流れているなら(クリアパターン)
 		if (CheckSoundMem(END_CLEAR_BGM.handle) != 0)
@@ -797,6 +791,7 @@ VOID MY_END_PROC(VOID)
 //エンド画面の描画
 VOID MY_END_DRAW(VOID)
 {
+	//背景を描画
 	DrawGraph(ImagePLAYENDBK.x, ImagePLAYENDBK.y, ImagePLAYENDBK.handle, TRUE);
 
 	switch (Jude)
@@ -829,9 +824,9 @@ BOOL MY_LOAD_IMAGE(VOID)
 		MessageBox(GetMainWindowHandle(), IMAGE_START_IMAGE_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(ImageSTARTBK.handle, &ImageSTARTBK.width, &ImageSTARTBK.height);
-	ImageSTARTBK.x = GAME_WIDTH / 2 - ImageSTARTBK.width / 2;
-	ImageSTARTBK.y = GAME_HEIGHT / 2 - ImageSTARTBK.height / 2;
+	GetGraphSize(ImageSTARTBK.handle, &ImageSTARTBK.width, &ImageSTARTBK.height);  //幅と高さを取得
+	ImageSTARTBK.x = GAME_WIDTH / 2 - ImageSTARTBK.width / 2;		//X位置を決める
+	ImageSTARTBK.y = GAME_HEIGHT / 2 - ImageSTARTBK.height / 2;     //Y位置を決める
 
 	//プレイ画面とエンド画面の背景画像
 	strcpy_s(ImagePLAYENDBK.path, IMAGE_PLAY_IMAGE_PATH);  //パスの設定
@@ -842,9 +837,9 @@ BOOL MY_LOAD_IMAGE(VOID)
 		MessageBox(GetMainWindowHandle(), IMAGE_PLAY_IMAGE_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(ImagePLAYENDBK.handle, &ImagePLAYENDBK.width, &ImagePLAYENDBK.height);
-	ImagePLAYENDBK.x = GAME_WIDTH / 2 - ImagePLAYENDBK.width / 2;
-	ImagePLAYENDBK.y = GAME_HEIGHT / 2 - ImagePLAYENDBK.height / 2;
+	GetGraphSize(ImagePLAYENDBK.handle, &ImagePLAYENDBK.width, &ImagePLAYENDBK.height);  //幅と高さを取得
+	ImagePLAYENDBK.x = GAME_WIDTH / 2 - ImagePLAYENDBK.width / 2;	//X位置を決める
+	ImagePLAYENDBK.y = GAME_HEIGHT / 2 - ImagePLAYENDBK.height / 2; //Y位置を決める
 
 	//操作説明画面へ促すためのボタン
 	strcpy_s(ImageMENUBtn.path, IMAGE_MENU_IMAGE_PATH);  //パスの設定
@@ -855,9 +850,9 @@ BOOL MY_LOAD_IMAGE(VOID)
 		MessageBox(GetMainWindowHandle(), IMAGE_MENU_IMAGE_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(ImageMENUBtn.handle, &ImageMENUBtn.width, &ImageMENUBtn.height);
-	ImageMENUBtn.x = GAME_WIDTH - ImageMENUBtn.width - 20;
-	ImageMENUBtn.y = GAME_HEIGHT - ImageMENUBtn.height - 20;
+	GetGraphSize(ImageMENUBtn.handle, &ImageMENUBtn.width, &ImageMENUBtn.height);  //幅と高さを取得
+	ImageMENUBtn.x = GAME_WIDTH - ImageMENUBtn.width - 20;			//X位置を決める
+	ImageMENUBtn.y = GAME_HEIGHT - ImageMENUBtn.height - 20;		//Y位置を決める
 
 	//操作説明画面の背景
 	strcpy_s(ImageMENUBK.path, IMAGE_MENU_BK_PATH);  //パスの設定
@@ -868,9 +863,9 @@ BOOL MY_LOAD_IMAGE(VOID)
 		MessageBox(GetMainWindowHandle(), IMAGE_MENU_BK_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(ImageMENUBK.handle, &ImageMENUBK.width, &ImageMENUBK.height);
-	ImageMENUBK.x = GAME_WIDTH / 2 - ImageMENUBK.width / 2;
-	ImageMENUBK.y = GAME_HEIGHT / 2 - ImageMENUBK.height / 2;
+	GetGraphSize(ImageMENUBK.handle, &ImageMENUBK.width, &ImageMENUBK.height);  //幅と高さを取得
+	ImageMENUBK.x = GAME_WIDTH / 2 - ImageMENUBK.width / 2;			//X位置を決める
+	ImageMENUBK.y = GAME_HEIGHT / 2 - ImageMENUBK.height / 2;		//Y位置を決める
 
 	//動物チップ
 	int animalRes = LoadDivGraph(
@@ -913,9 +908,9 @@ BOOL MY_LOAD_IMAGE(VOID)
 		MessageBox(GetMainWindowHandle(), IMAGE_END_CLEAR_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(ImageEndClear.handle, &ImageEndClear.width, &ImageEndClear.height);
-	ImageEndClear.x = GAME_WIDTH / 2 - ImageEndClear.width / 2;
-	ImageEndClear.y = GAME_HEIGHT / 2 - ImageEndClear.height / 2 - 75;
+	GetGraphSize(ImageEndClear.handle, &ImageEndClear.width, &ImageEndClear.height);  //幅と高さを取得
+	ImageEndClear.x = GAME_WIDTH / 2 - ImageEndClear.width / 2;			//X位置を決める
+	ImageEndClear.y = GAME_HEIGHT / 2 - ImageEndClear.height / 2 - 75;  //Y位置を決める
 
 	//失敗の画像
 	strcpy_s(ImageEndFail.path, IMAGE_END_FAIL_PATH);  //パスの設定
@@ -926,9 +921,9 @@ BOOL MY_LOAD_IMAGE(VOID)
 		MessageBox(GetMainWindowHandle(), IMAGE_END_FAIL_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(ImageEndFail.handle, &ImageEndFail.width, &ImageEndFail.height);
-	ImageEndFail.x = GAME_WIDTH / 2 - ImageEndFail.width / 2;
-	ImageEndFail.y = GAME_HEIGHT / 2 - ImageEndFail.height / 2 - 75;
+	GetGraphSize(ImageEndFail.handle, &ImageEndFail.width, &ImageEndFail.height);  //幅と高さを取得
+	ImageEndFail.x = GAME_WIDTH / 2 - ImageEndFail.width / 2;			//X位置を決める
+	ImageEndFail.y = GAME_HEIGHT / 2 - ImageEndFail.height / 2 - 75;    //Y位置を決める
 
 	//操作説明の1枚目の背景
 	strcpy_s(ImageMENU1.image.path, IMAGE_MENU_1_PATH);  //パスの設定
@@ -939,10 +934,10 @@ BOOL MY_LOAD_IMAGE(VOID)
 		MessageBox(GetMainWindowHandle(), IMAGE_MENU_1_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(ImageMENU1.image.handle, &ImageMENU1.image.width, &ImageMENU1.image.height);
-	ImageMENU1.image.x = 0;
-	ImageMENU1.image.y = 0;
-	ImageMENU1.IsDraw = TRUE;
+	GetGraphSize(ImageMENU1.image.handle, &ImageMENU1.image.width, &ImageMENU1.image.height);  //幅と高さを取得
+	ImageMENU1.image.x = 0;				//X位置を決める
+	ImageMENU1.image.y = 0;				//Y位置を決める
+	ImageMENU1.IsDraw = TRUE;			//最初は描画できる
 
 	//操作説明の2枚目の背景
 	strcpy_s(ImageMENU2.image.path, IMAGE_MENU_2_PATH);  //パスの設定
@@ -953,10 +948,10 @@ BOOL MY_LOAD_IMAGE(VOID)
 		MessageBox(GetMainWindowHandle(), IMAGE_MENU_2_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(ImageMENU2.image.handle, &ImageMENU2.image.width, &ImageMENU2.image.height);
-	ImageMENU2.image.x = 0;
-	ImageMENU2.image.y = 0;
-	ImageMENU2.IsDraw = FALSE;
+	GetGraphSize(ImageMENU2.image.handle, &ImageMENU2.image.width, &ImageMENU2.image.height);  //幅と高さを取得
+	ImageMENU2.image.x = 0;				//X位置を決める
+	ImageMENU2.image.y = 0;				//Y位置を決める
+	ImageMENU2.IsDraw = FALSE;			//最初は描画しない
 
 	//お客様からのメッセージ(成功パターン)
 	strcpy_s(ImageMessage1.path, IMAGE_MESSAGE_1_PATH);  //パスの設定
@@ -967,9 +962,9 @@ BOOL MY_LOAD_IMAGE(VOID)
 		MessageBox(GetMainWindowHandle(), IMAGE_MESSAGE_1_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(ImageMessage1.handle, &ImageMessage1.width, &ImageMessage1.height);
-	ImageMessage1.x = GAME_WIDTH / 2 - ImageMessage1.width / 2;
-	ImageMessage1.y = ImageEndClear.y + ImageEndClear.height;
+	GetGraphSize(ImageMessage1.handle, &ImageMessage1.width, &ImageMessage1.height);  //幅と高さを取得
+	ImageMessage1.x = GAME_WIDTH / 2 - ImageMessage1.width / 2;			//X位置を決める
+	ImageMessage1.y = ImageEndClear.y + ImageEndClear.height;			//Y位置を決める
 
 	//お客様からのメッセージ(失敗パターン)
 	strcpy_s(ImageMessage2.path, IMAGE_MESSAGE_2_PATH);  //パスの設定
@@ -980,9 +975,9 @@ BOOL MY_LOAD_IMAGE(VOID)
 		MessageBox(GetMainWindowHandle(), IMAGE_MESSAGE_2_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(ImageMessage2.handle, &ImageMessage2.width, &ImageMessage2.height);
-	ImageMessage2.x = GAME_WIDTH / 2 - ImageMessage2.width / 2;
-	ImageMessage2.y = ImageEndFail.y + ImageEndFail.height;
+	GetGraphSize(ImageMessage2.handle, &ImageMessage2.width, &ImageMessage2.height);  //幅と高さを取得
+	ImageMessage2.x = GAME_WIDTH / 2 - ImageMessage2.width / 2;			//X位置を決める
+	ImageMessage2.y = ImageEndFail.y + ImageEndFail.height;				//Y位置を決める
 
 	return TRUE;
 }
@@ -1137,6 +1132,8 @@ VOID MY_DELETE_MUSIC(VOID)
 {
 	DeleteSoundMem(START_BGM.handle);
 	DeleteSoundMem(PLAY_BGM.handle);
+	DeleteSoundMem(END_CLEAR_BGM.handle);
+	DeleteSoundMem(END_FAIL_BGM.handle);
 
 	return;
 }
