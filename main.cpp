@@ -46,7 +46,7 @@
 
 //マスク関連
 #define EASY_HAVE_MASK				20		//マスクの上限(Easyモード)
-#define EASY_GIVE_MASK_RANGE		5		//マスクのランダム数(Easyモード)
+#define EASY_GIVE_MASK_RANGE		4		//マスクのランダム数(Easyモード)
 
 //フォントのパスの長さ
 #define FONT_PATH_MAX			255
@@ -172,6 +172,7 @@ FONT TANUKI;
 
 //クリアか失敗か
 int Jude;
+BOOL First_Qus = TRUE;
 
 //音楽関連
 MUSIC START_BGM;		//スタート画面のBGM
@@ -460,6 +461,7 @@ VOID MY_START_PROC(VOID)
 		HaveMask = EASY_HAVE_MASK;			//マスクの上限個数の設定
 		GiveMask = EASY_GIVE_MASK_RANGE;	//上げるマスクのランダム数の設定
 		GameScene = GAME_SCENE_PLAY;
+		StartTime = GetNowCount();
 
 		//BGMが流れているなら
 		if (CheckSoundMem(START_BGM.handle) != 0)
@@ -548,15 +550,53 @@ VOID MY_PLAY(VOID)
 //プレイ画面の処理
 VOID MY_PLAY_PROC(VOID)
 {
-	if (First_flg == TRUE)
+	//BGMが流れていないなら
+	if (CheckSoundMem(PLAY_BGM.handle) == 0)
 	{
-		StartTime = GetNowCount();
-		TimeLimit = GAME_TIME;
-		First_flg = FALSE;
+		//BGMの音量を下げる
+		ChangeVolumeSoundMem(255 * 50 / 100, PLAY_BGM.handle);  //50%の音量にする
+		PlaySoundMem(PLAY_BGM.handle, DX_PLAYTYPE_LOOP);
 	}
 
+	if (First_flg == TRUE)
+	{
+		/*TimeLimit = 3;
+		ElaTime = (TimeLimit - ((GetNowCount() - StartTime) / 1000));
+
+		if (ElaTime <= 0)
+		{*/
+			StartTime = GetNowCount();
+			TimeLimit = GAME_TIME;
+			First_flg = FALSE;
+		//}
+	}
 	else
 	{
+		ElaTime = (TimeLimit - (GetNowCount() - StartTime) / 1000);
+
+		if (ElaTime <= 0)
+		{
+			Jude = JUDE_OVER;
+
+			GameScene = GAME_SCENE_END;
+
+			//画像の消去・初期化
+			MY_PICTURE_INIT();
+
+			return;
+		}
+
+		//最初の問題を表示
+		if (First_Qus)
+		{
+			animal[order].IsDraw = TRUE;			//表示
+			order++;
+
+			Mask_num = GetRand(GiveMask) + 1;
+
+			First_Qus = FALSE;
+		}
+
 		//エンターキーを押す際の行動パターン(マスクを「あげる」)
 		if (MY_KEYDOWN_1SECOND(KEY_INPUT_RETURN) == TRUE)
 		{
@@ -570,34 +610,14 @@ VOID MY_PLAY_PROC(VOID)
 			}*/
 
 			//▼▼▼▼▼考える時間が一定時間過ぎるとゲームオーバー(修正箇所多々残留)▼▼▼▼▼
-			//ElaTime = (TimeLimit - (GetNowCount() - StartTime) / 1000);
-
-			//if (ElaTime <= 0)
-			//{
-			//	Jude = JUDE_OVER;
-
-			//	GameScene = GAME_SCENE_END;
-
-			//	//画像の消去・初期化
-			//	MY_PICTURE_INIT();
-
-			//	return;
-			//}
+			
 			//▲▲▲▲▲
-
-			//BGMが流れていないなら
-			if (CheckSoundMem(PLAY_BGM.handle) == 0)
-			{
-				//BGMの音量を下げる
-				ChangeVolumeSoundMem(255 * 50 / 100, PLAY_BGM.handle);  //50%の音量にする
-				PlaySoundMem(PLAY_BGM.handle, DX_PLAYTYPE_LOOP);
-			}
 
 			//加算していく
 			Mask_sum += Mask_num;
 
 			//乱数を取得
-			Mask_num = GetRand(GiveMask);
+			Mask_num = GetRand(GiveMask) + 1;
 
 			//一定量を超えたら終了
 			if (Mask_sum > HaveMask)
@@ -640,6 +660,8 @@ VOID MY_PLAY_PROC(VOID)
 				animal[order].IsDraw = TRUE;			//表示
 				order++;
 			}
+			ElaTime = 0;
+			StartTime = GetNowCount();
 		}
 
 		//デリートーキーを押す際の行動パターン(マスクを「あげない」)
@@ -693,7 +715,7 @@ VOID MY_PLAY_DRAW(VOID)
 	//プレイ画面の背景
 	DrawGraph(ImagePLAYENDBK.x, ImagePLAYENDBK.y, ImagePLAYENDBK.handle, TRUE);
 
-	//DrawFormatStringToHandle(0, 200, GetColor(255, 255, 255), TANUKI.handle, "%dミリ秒", ElaTime);
+	DrawFormatStringToHandle(0, 200, GetColor(255, 255, 255), TANUKI.handle, "%dミリ秒", ElaTime);
 	//DrawFormatStringToHandle(0, 200, GetColor(255, 255, 255), TANUKI.handle, "%dミリ秒", StartTime);
 
 	//トークシーンの背景
@@ -1026,6 +1048,7 @@ VOID MY_PICTURE_INIT(VOID)
 	Mask_num = 0;
 	Mask_sum = 0;
 	First_flg = TRUE;
+	First_Qus = TRUE;
 
 	return;
 }
