@@ -68,7 +68,7 @@
 //エラーメッセージ
 #define MUSIC_LOAD_ERR_TITLE	TEXT("音楽読み込みエラー")
 
-#define GAME_TIME				5
+#define GAME_TIME				5 * 1000	//1000ミリ＝１秒
 
 enum GAME_SCENE {
 	GAME_SCENE_START,  //スタート画面
@@ -150,9 +150,9 @@ int HaveMask = 0;   //各モードの上限マスク個数
 int GiveMask = 0;   //あげるマスクのランダム数
 
 //時間関連
-double StartTime = 0;		//計測開始時間
-double ElaTime = 0;		//残り時間
-double TimeLimit = 0;
+int StartTime = 0;		//計測開始時間
+int ElaTime = 0;		//残り時間
+int TimeLimit = 0;
 BOOL First_flg = TRUE;
 
 //画像関連
@@ -531,9 +531,9 @@ VOID MY_MENU_DRAW(VOID)
 	//背景を描画する
 	DrawGraph(ImageMENUBK.x, ImageMENUBK.y, ImageMENUBK.handle, TRUE);
 
-	if(ImageMENU1.IsDraw == TRUE)  //説明画像の1枚目
+	if (ImageMENU1.IsDraw == TRUE)  //説明画像の1枚目
 		DrawGraph(ImageMENU1.image.x, ImageMENU1.image.y, ImageMENU1.image.handle, TRUE);
-	if(ImageMENU2.IsDraw == TRUE)  //説明画像の2枚目
+	if (ImageMENU2.IsDraw == TRUE)  //説明画像の2枚目
 		DrawGraph(ImageMENU2.image.x, ImageMENU2.image.y, ImageMENU2.image.handle, TRUE);
 	return;
 }
@@ -565,14 +565,16 @@ VOID MY_PLAY_PROC(VOID)
 
 		if (ElaTime <= 0)
 		{*/
-			StartTime = GetNowCount();
-			TimeLimit = GAME_TIME;
-			First_flg = FALSE;
+		StartTime = GetNowCount();
+		TimeLimit = GAME_TIME;
+		First_flg = FALSE;
 		//}
 	}
 	else
 	{
-		ElaTime = (TimeLimit - (GetNowCount() - StartTime) / 1000);
+		int NowCount = GetNowCount();
+
+		ElaTime = TimeLimit - (NowCount - StartTime);
 
 		if (ElaTime <= 0)
 		{
@@ -610,7 +612,7 @@ VOID MY_PLAY_PROC(VOID)
 			}*/
 
 			//▼▼▼▼▼考える時間が一定時間過ぎるとゲームオーバー(修正箇所多々残留)▼▼▼▼▼
-			
+
 			//▲▲▲▲▲
 
 			//加算していく
@@ -715,7 +717,7 @@ VOID MY_PLAY_DRAW(VOID)
 	//プレイ画面の背景
 	DrawGraph(ImagePLAYENDBK.x, ImagePLAYENDBK.y, ImagePLAYENDBK.handle, TRUE);
 
-	DrawFormatStringToHandle(0, 200, GetColor(255, 255, 255), TANUKI.handle, "%dミリ秒", ElaTime);
+	DrawFormatStringToHandle(0, 200, GetColor(255, 255, 255), TANUKI.handle, "%d秒", (ElaTime / 1000) + 1);
 	//DrawFormatStringToHandle(0, 200, GetColor(255, 255, 255), TANUKI.handle, "%dミリ秒", StartTime);
 
 	//トークシーンの背景
@@ -765,7 +767,7 @@ VOID MY_END_PROC(VOID)
 {
 	switch (Jude)
 	{
-	//クリアパターン
+		//クリアパターン
 	case JUDE_CLEAR:
 		//BGMが流れていないなら
 		if (CheckSoundMem(END_CLEAR_BGM.handle) == 0)
@@ -776,7 +778,7 @@ VOID MY_END_PROC(VOID)
 		}
 		break;
 
-	//失敗パターン
+		//失敗パターン
 	case JUDE_OVER:
 		//BGMが流れていないなら
 		if (CheckSoundMem(END_FAIL_BGM.handle) == 0)
@@ -818,13 +820,13 @@ VOID MY_END_DRAW(VOID)
 
 	switch (Jude)
 	{
-	//クリアパターン
+		//クリアパターン
 	case JUDE_CLEAR:
 		DrawGraph(ImageEndClear.x, ImageEndClear.y, ImageEndClear.handle, TRUE);
 		DrawGraph(ImageMessage1.x, ImageMessage1.y, ImageMessage1.handle, TRUE);
 		break;
 
-	//失敗パターン
+		//失敗パターン
 	case JUDE_OVER:
 		DrawGraph(ImageEndFail.x, ImageEndFail.y, ImageEndFail.handle, TRUE);
 		DrawGraph(ImageMessage2.x, ImageMessage2.y, ImageMessage2.handle, TRUE);
