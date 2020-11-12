@@ -153,7 +153,8 @@ int GiveMask = 0;   //あげるマスクのランダム数
 int StartTime = 0;		//計測開始時間
 int ElaTime = 0;		//残り時間
 int TimeLimit = 0;		//制限時間
-BOOL First_flg = TRUE;
+BOOL First_flg = TRUE;  //ゲームに入る際のカウントダウンをする
+BOOL CountDown = TRUE;  //カウントダウンをする際の基準時間を確保する
 
 //画像関連
 IMAGE ImageSTARTBK;		//ゲームの背景(スタート画面)
@@ -559,17 +560,24 @@ VOID MY_PLAY_PROC(VOID)
 		PlaySoundMem(PLAY_BGM.handle, DX_PLAYTYPE_LOOP);
 	}
 
-	if (First_flg == TRUE)
+	if (First_flg)  //まずカウントダウンからスタート
 	{
-		/*TimeLimit = 3;
-		ElaTime = (TimeLimit - ((GetNowCount() - StartTime) / 1000));
+		if (CountDown)  //基準時間を取得
+		{
+			StartTime = GetNowCount();
+			CountDown = FALSE;		//これ以降はこのif文は行わない
+		}
 
+		TimeLimit = 3 * 1000;  //3秒間のカウントダウンを行う
+		ElaTime = TimeLimit - (GetNowCount() - StartTime);
+
+		////経過時間が0秒になったら(・・・3,2,1 で終了させるため <=)
 		if (ElaTime <= 0)
-		{*/
-		StartTime = GetNowCount();
-		TimeLimit = GAME_TIME;
-		First_flg = FALSE;
-		//}
+		{
+			StartTime = GetNowCount();  //最初の問題用に基準時間を設定
+			TimeLimit = GAME_TIME;		//制限時間を設定
+			First_flg = FALSE;			//これ以降はカウントダウンは行わない
+		}
 	}
 	else
 	{
@@ -579,7 +587,7 @@ VOID MY_PLAY_PROC(VOID)
 		//制限時間(降順で時間表示) - (現在の時間 - 基準の時間)、ミリ秒単位
 		ElaTime = TimeLimit - (NowCount - StartTime);
 
-		//経過時間が0秒になったら(・・・3,2,1 で終了させる)
+		//経過時間が0秒になったら(・・・3,2,1 で終了させるため <=)
 		if (ElaTime <= 0)
 		{
 			Jude = JUDE_OVER;  //判定はゲームオーバー
@@ -714,11 +722,19 @@ VOID MY_PLAY_DRAW(VOID)
 	//プレイ画面の背景
 	DrawGraph(ImagePLAYENDBK.x, ImagePLAYENDBK.y, ImagePLAYENDBK.handle, TRUE);
 
-	//制限時間の表示
-	//1000で割って「ミリ秒単位」から「秒単位」に
-	//0 が出てきてしまうので +1する
-	DrawFormatStringToHandle(0, 200, GetColor(255, 255, 255), TANUKI.handle, "%d秒", (ElaTime / 1000) + 1);
+	if (First_flg)
+	{
+		DrawFormatStringToHandle(100, 200, GetColor(255, 0, 0), TANUKI.handle, "%d秒", (ElaTime / 1000) + 1);
+	}
+	else 
+	{
+		//制限時間の表示
+		//1000で割って「ミリ秒単位」から「秒単位」に
+		//0 が出てきてしまうので +1する
+		DrawFormatStringToHandle(0, 200, GetColor(255, 255, 255), TANUKI.handle, "%d秒", (ElaTime / 1000) + 1);
+	}
 
+	
 	//トークシーンの背景
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 192);  //透明度を25%上げる
 	DrawBox(0, GAME_HEIGHT - 180, GAME_WIDTH, GAME_HEIGHT, GetColor(0, 0, 0), TRUE);
