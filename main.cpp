@@ -1,5 +1,5 @@
 /*--+----1----+----2----+----3----+----4----+----5-----+----6----+----7----+----8----+----9----+---*/
-//無限ループ
+//
 
 //########## ヘッダーファイル読み込み ##########
 #include "DxLib.h"
@@ -46,7 +46,7 @@
 
 //マスク関連
 #define EASY_HAVE_MASK				20		//マスクの上限(Easyモード)
-#define EASY_GIVE_MASK_RANGE		4		//マスクのランダム数(Easyモード)
+#define EASY_GIVE_MASK_RANGE		4		//マスクのランダム数(Easyモード、0～4)
 
 //フォントのパスの長さ
 #define FONT_PATH_MAX			255
@@ -152,7 +152,7 @@ int GiveMask = 0;   //あげるマスクのランダム数
 //時間関連
 int StartTime = 0;		//計測開始時間
 int ElaTime = 0;		//残り時間
-int TimeLimit = 0;
+int TimeLimit = 0;		//制限時間
 BOOL First_flg = TRUE;
 
 //画像関連
@@ -181,35 +181,35 @@ MUSIC END_CLEAR_BGM;	//エンド画面(クリアパターン)のBGM
 MUSIC END_FAIL_BGM;		//エンド画面(失敗パターン)のBGM
 
 //プロトタイプ宣言
-VOID MY_FPS_UPDATE(VOID);		//FPS値を計測、更新する関数
-VOID MY_FPS_DRAW(VOID);			//FPS値を描画する関数
-VOID MY_FPS_WAIT(VOID);			//FPS値を計測し。待つ関数
+VOID MY_FPS_UPDATE(VOID);			//FPS値を計測、更新する関数
+VOID MY_FPS_DRAW(VOID);				//FPS値を描画する関数
+VOID MY_FPS_WAIT(VOID);				//FPS値を計測し。待つ関数
 
-VOID MY_ALL_KEYDOWN_UPDATE(VOID);  //キーの入力状態を更新する
-BOOL MY_KEY_DOWN(int);			   //キーを押しているか、キーコードで判断する
-BOOL MY_KEY_UP(int);			   //キーを押し上げたか、キーコードで判断する
-BOOL MY_KEYDOWN_KEEP(int, int);    //キーを押し続けているか、キーコードで判断する
-BOOL MY_KEYDOWN_1SECOND(int);      //キーを1秒間押し続けたか
+VOID MY_ALL_KEYDOWN_UPDATE(VOID);   //キーの入力状態を更新する
+BOOL MY_KEY_DOWN(int);			    //キーを押しているか、キーコードで判断する
+BOOL MY_KEY_UP(int);				//キーを押し上げたか、キーコードで判断する
+BOOL MY_KEYDOWN_KEEP(int, int);		//キーを押し続けているか、キーコードで判断する
+BOOL MY_KEYDOWN_1SECOND(int);		//キーを1秒間押し続けたか
 
-VOID MY_START(VOID);		//スタート画面
-VOID MY_START_PROC(VOID);   //スタート画面の処理
-VOID MY_START_DRAW(VOID);   //スタート画面の描画
+VOID MY_START(VOID);				//スタート画面
+VOID MY_START_PROC(VOID);			//スタート画面の処理
+VOID MY_START_DRAW(VOID);			//スタート画面の描画
 
-VOID MY_PLAY(VOID);		   //プレイ画面
-VOID MY_PLAY_PROC(VOID);   //プレイ画面の処理
-VOID MY_PLAY_DRAW(VOID);   //プレイ画面の描画
+VOID MY_PLAY(VOID);					//プレイ画面
+VOID MY_PLAY_PROC(VOID);			//プレイ画面の処理
+VOID MY_PLAY_DRAW(VOID);			//プレイ画面の描画
 
-VOID MY_END(VOID);		  //エンド画面
-VOID MY_END_PROC(VOID);   //エンド画面の処理
-VOID MY_END_DRAW(VOID);   //エンド画面の描画
+VOID MY_END(VOID);					//エンド画面
+VOID MY_END_PROC(VOID);				//エンド画面の処理
+VOID MY_END_DRAW(VOID);				//エンド画面の描画
 
-VOID MY_MENU(VOID);       //操作説明画面
-VOID MY_MENU_PROC(VOID);  //操作説明画面の処理
-VOID MY_MENU_DRAW(VOID);  //操作説明画面の描画
+VOID MY_MENU(VOID);					//操作説明画面
+VOID MY_MENU_PROC(VOID);			//操作説明画面の処理
+VOID MY_MENU_DRAW(VOID);			//操作説明画面の描画
 
-BOOL MY_LOAD_IMAGE(VOID);    //画像をまとめて読み込む関数
-VOID MY_DELETE_IMAGE(VOID);  //画像をまとめて削除する関数
-VOID MY_PICTURE_INIT(VOID);  //画像の消去・初期化する関数
+BOOL MY_LOAD_IMAGE(VOID);			//画像をまとめて読み込む関数
+VOID MY_DELETE_IMAGE(VOID);			//画像をまとめて削除する関数
+VOID MY_PICTURE_INIT(VOID);			//画像の消去・初期化する関数
 
 BOOL MY_FONT_INSTALL_ONCE(VOID);    //フォントを一時的にインストール
 VOID MY_FONT_UNINSTALL_ONCE(VOID);  //フォントを一時的にアンインストール
@@ -503,6 +503,7 @@ VOID MY_MENU(VOID)
 //操作説明画面の処理
 VOID MY_MENU_PROC(VOID)
 {
+	//バックスペースキーを押したら
 	if (MY_KEY_DOWN(KEY_INPUT_BACK) == TRUE)
 	{
 		//スタート画面に戻る
@@ -572,18 +573,27 @@ VOID MY_PLAY_PROC(VOID)
 	}
 	else
 	{
+		//現在の時間を取得
 		int NowCount = GetNowCount();
 
+		//制限時間(降順で時間表示) - (現在の時間 - 基準の時間)、ミリ秒単位
 		ElaTime = TimeLimit - (NowCount - StartTime);
 
+		//経過時間が0秒になったら(・・・3,2,1 で終了させる)
 		if (ElaTime <= 0)
 		{
-			Jude = JUDE_OVER;
+			Jude = JUDE_OVER;  //判定はゲームオーバー
 
-			GameScene = GAME_SCENE_END;
+			GameScene = GAME_SCENE_END;  //エンド画面へ
 
 			//画像の消去・初期化
 			MY_PICTURE_INIT();
+
+			//BGMが流れているなら
+			if (CheckSoundMem(PLAY_BGM.handle) != 0)
+			{
+				StopSoundMem(PLAY_BGM.handle);   //BGMを止める
+			}
 
 			return;
 		}
@@ -596,25 +606,12 @@ VOID MY_PLAY_PROC(VOID)
 
 			Mask_num = GetRand(GiveMask) + 1;
 
-			First_Qus = FALSE;
+			First_Qus = FALSE;  //次以降は表示しない
 		}
 
 		//エンターキーを押す際の行動パターン(マスクを「あげる」)
 		if (MY_KEYDOWN_1SECOND(KEY_INPUT_RETURN) == TRUE)
 		{
-			//ElaTime = GetNowCount();
-
-			//ElaTime = (TimeLimit - (GetNowCount() - (StartTime = GetNowCount())) / 1000);
-
-			/*if (ElaTime <= 0)
-			{
-				GameScene = GAME_SCENE_MENU;
-			}*/
-
-			//▼▼▼▼▼考える時間が一定時間過ぎるとゲームオーバー(修正箇所多々残留)▼▼▼▼▼
-
-			//▲▲▲▲▲
-
 			//加算していく
 			Mask_sum += Mask_num;
 
@@ -662,17 +659,17 @@ VOID MY_PLAY_PROC(VOID)
 				animal[order].IsDraw = TRUE;			//表示
 				order++;
 			}
-			ElaTime = 0;
+			//再度、基準時間を更新する
 			StartTime = GetNowCount();
 		}
 
 		//デリートーキーを押す際の行動パターン(マスクを「あげない」)
 		if (MY_KEYDOWN_1SECOND(KEY_INPUT_DELETE) == TRUE)
 		{
-			//成功パターン
+			//成功パターン (マスクが無くなる手前でストップ)
 			if ((Mask_sum + Mask_num) >= HaveMask)
 			{
-				Jude = JUDE_CLEAR;  //判定は「失敗」
+				Jude = JUDE_CLEAR;  //判定は「成功」
 
 				GameScene = GAME_SCENE_END;  //エンド画面に移動
 
@@ -687,7 +684,7 @@ VOID MY_PLAY_PROC(VOID)
 
 				return;
 			}
-			//失敗パターン
+			//失敗パターン (マスクが手元に残ってない)
 			else if ((Mask_sum + Mask_num) < HaveMask)
 			{
 				Jude = JUDE_OVER;  //判定は「失敗」
@@ -717,8 +714,10 @@ VOID MY_PLAY_DRAW(VOID)
 	//プレイ画面の背景
 	DrawGraph(ImagePLAYENDBK.x, ImagePLAYENDBK.y, ImagePLAYENDBK.handle, TRUE);
 
+	//制限時間の表示
+	//1000で割って「ミリ秒単位」から「秒単位」に
+	//0 が出てきてしまうので +1する
 	DrawFormatStringToHandle(0, 200, GetColor(255, 255, 255), TANUKI.handle, "%d秒", (ElaTime / 1000) + 1);
-	//DrawFormatStringToHandle(0, 200, GetColor(255, 255, 255), TANUKI.handle, "%dミリ秒", StartTime);
 
 	//トークシーンの背景
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 192);  //透明度を25%上げる
@@ -765,10 +764,10 @@ VOID MY_END(VOID)
 //エンド画面の処理
 VOID MY_END_PROC(VOID)
 {
+	//クリアか失敗か判定
 	switch (Jude)
 	{
-		//クリアパターン
-	case JUDE_CLEAR:
+	case JUDE_CLEAR:  //クリアパターン
 		//BGMが流れていないなら
 		if (CheckSoundMem(END_CLEAR_BGM.handle) == 0)
 		{
@@ -778,8 +777,7 @@ VOID MY_END_PROC(VOID)
 		}
 		break;
 
-		//失敗パターン
-	case JUDE_OVER:
+	case JUDE_OVER:  //失敗パターン
 		//BGMが流れていないなら
 		if (CheckSoundMem(END_FAIL_BGM.handle) == 0)
 		{
@@ -818,6 +816,7 @@ VOID MY_END_DRAW(VOID)
 	//背景を描画
 	DrawGraph(ImagePLAYENDBK.x, ImagePLAYENDBK.y, ImagePLAYENDBK.handle, TRUE);
 
+	//成功、失敗に応じて表示する画像を変更
 	switch (Jude)
 	{
 		//クリアパターン
@@ -1009,11 +1008,10 @@ BOOL MY_LOAD_IMAGE(VOID)
 //画像をまとめて削除する関数
 VOID MY_DELETE_IMAGE(VOID)
 {
-	//背景の画像
-	DeleteGraph(ImageSTARTBK.handle);
-	DeleteGraph(ImagePLAYENDBK.handle);
-	DeleteGraph(ImageMENUBtn.handle);
-	DeleteGraph(ImageMENUBK.handle);
+	DeleteGraph(ImageSTARTBK.handle);		//スタート画面の背景
+	DeleteGraph(ImagePLAYENDBK.handle);		//プレイ・エンド画面の背景
+	DeleteGraph(ImageMENUBtn.handle);		//ボタン
+	DeleteGraph(ImageMENUBK.handle);        //操作説明画面の背景
 
 	//動物チップ
 	for (int i_num = 0; i_num < CHIP_DIV_NUM; i_num++)
@@ -1046,6 +1044,7 @@ VOID MY_PICTURE_INIT(VOID)
 	}
 	//再開しても最初から
 	order = 0;
+
 	//初期化
 	Mask_num = 0;
 	Mask_sum = 0;
@@ -1110,8 +1109,8 @@ VOID MY_FONT_DELETE(VOID)
 BOOL MY_LOAD_MUSIC(VOID)
 {
 	//スタート画面の音楽
-	strcpy_s(START_BGM.path, MUSIC_START_BGM_PATH);
-	START_BGM.handle = LoadSoundMem(START_BGM.path);
+	strcpy_s(START_BGM.path, MUSIC_START_BGM_PATH);		//パスの設定
+	START_BGM.handle = LoadSoundMem(START_BGM.path);	//読み込み
 	if (START_BGM.handle == -1)
 	{
 		//エラーメッセージ表示
@@ -1120,8 +1119,8 @@ BOOL MY_LOAD_MUSIC(VOID)
 	}
 
 	//プレイ画面の音楽
-	strcpy_s(PLAY_BGM.path, MUSIC_PLAY_BGM_PATH);
-	PLAY_BGM.handle = LoadSoundMem(PLAY_BGM.path);
+	strcpy_s(PLAY_BGM.path, MUSIC_PLAY_BGM_PATH);		//パスの設定
+	PLAY_BGM.handle = LoadSoundMem(PLAY_BGM.path);		//読み込み
 	if (PLAY_BGM.handle == -1)
 	{
 		//エラーメッセージ表示
@@ -1130,8 +1129,8 @@ BOOL MY_LOAD_MUSIC(VOID)
 	}
 
 	//エンド画面(クリアパターン)の音楽
-	strcpy_s(END_CLEAR_BGM.path, MUSIC_END_CLEAR_PATH);
-	END_CLEAR_BGM.handle = LoadSoundMem(END_CLEAR_BGM.path);
+	strcpy_s(END_CLEAR_BGM.path, MUSIC_END_CLEAR_PATH);			//パスの設定
+	END_CLEAR_BGM.handle = LoadSoundMem(END_CLEAR_BGM.path);	//読み込み
 	if (END_CLEAR_BGM.handle == -1)
 	{
 		//エラーメッセージ表示
@@ -1140,8 +1139,8 @@ BOOL MY_LOAD_MUSIC(VOID)
 	}
 
 	//エンド画面(失敗パターン)の音楽
-	strcpy_s(END_FAIL_BGM.path, MUSIC_END_FAIL_PATH);
-	END_FAIL_BGM.handle = LoadSoundMem(END_FAIL_BGM.path);
+	strcpy_s(END_FAIL_BGM.path, MUSIC_END_FAIL_PATH);			//パスの設定
+	END_FAIL_BGM.handle = LoadSoundMem(END_FAIL_BGM.path);		//読み込み
 	if (END_FAIL_BGM.handle == -1)
 	{
 		//エラーメッセージ表示
