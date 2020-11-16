@@ -45,8 +45,12 @@
 #define CHIP_DIV_NUM GAME_animal1_DIV_TATE * GAME_animal1_DIV_YOKO  //画像を分割する総数
 
 //マスク関連
-#define EASY_HAVE_MASK				20		//マスクの上限(Easyモード)
+#define EASY_HAVE_MASK				20		//マスクの上限(Easyモード、20個)
+#define NORMAL_HAVE_MASK			50		//マスクの上限(Normalモード、50個)
+#define HARD_HAVE_MASK				100		//マスクの上限(Hardモード、100個)
 #define EASY_GIVE_MASK_RANGE		4		//マスクのランダム数(Easyモード、0～4)
+#define NORMAL_GIVE_MASK_RANGE		10		//マスクのランダム数(Normalモード、0～9)
+#define HARD_GIVE_MASK_RANGE		20		//マスクのランダム数(Hardモード、0～19)
 
 //フォントのパスの長さ
 #define FONT_PATH_MAX			255
@@ -68,7 +72,10 @@
 //エラーメッセージ
 #define MUSIC_LOAD_ERR_TITLE	TEXT("音楽読み込みエラー")
 
-#define GAME_TIME				5 * 1000	//1000ミリ＝１秒
+//各モードの制限時間  1000ミリ＝１秒
+#define EASY_TIMELIMIT				5 * 1000	//制限時間(Easyモード、5秒間)
+#define NORMAL_TIMELIMIT			10 * 1000	//制限時間(Normalモード、10秒間)
+#define HARD_TIMELIMIT				15 * 1000	//制限時間(Hardモード、15秒間)
 
 enum GAME_SCENE {
 	GAME_SCENE_START,  //スタート画面
@@ -152,6 +159,7 @@ int GiveMask = 0;   //あげるマスクのランダム数
 //時間関連
 int StartTime = 0;		//計測開始時間
 int ElaTime = 0;		//残り時間
+int CDTimeLimit = 0;	//カウントダウン用の制限時間(CD = CountDown)
 int TimeLimit = 0;		//制限時間
 BOOL First_flg = TRUE;  //ゲームに入る際のカウントダウンをする
 BOOL CountDown = TRUE;  //カウントダウンをする際の基準時間を確保する
@@ -173,6 +181,8 @@ FONT TANUKI;
 
 //クリアか失敗か
 int Jude;
+
+//最初の問題を表示するための関数
 BOOL First_Qus = TRUE;
 
 //音楽関連
@@ -455,14 +465,47 @@ VOID MY_START_PROC(VOID)
 		PlaySoundMem(START_BGM.handle, DX_PLAYTYPE_LOOP);
 	}
 
-	//エンターキーを押したら、プレイシーンへ移動する
-	if (MY_KEY_DOWN(KEY_INPUT_RETURN) == TRUE)
+	//1キーを押したら、プレイシーンへ移動する(Easyモード)
+	if (MY_KEY_DOWN(KEY_INPUT_1) == TRUE)
 	{
 		//プレイ画面に向けて準備
 		HaveMask = EASY_HAVE_MASK;			//マスクの上限個数の設定
 		GiveMask = EASY_GIVE_MASK_RANGE;	//上げるマスクのランダム数の設定
-		GameScene = GAME_SCENE_PLAY;
-		StartTime = GetNowCount();
+		GameScene = GAME_SCENE_PLAY;		//プレイ画面に遷移
+		StartTime = GetNowCount();			//基準時間を取得
+		TimeLimit = EASY_TIMELIMIT;			//制限時間を設定
+
+		//BGMが流れているなら
+		if (CheckSoundMem(START_BGM.handle) != 0)
+		{
+			StopSoundMem(START_BGM.handle);   //BGMを止める
+		}
+	}
+	//2キーを押したら、プレイシーンへ移動する(Normalモード)
+	else if (MY_KEY_DOWN(KEY_INPUT_2) == TRUE)
+	{
+		//プレイ画面に向けて準備
+		HaveMask = NORMAL_HAVE_MASK;		//マスクの上限個数の設定
+		GiveMask = NORMAL_GIVE_MASK_RANGE;	//上げるマスクのランダム数の設定
+		GameScene = GAME_SCENE_PLAY;		//プレイ画面に遷移
+		StartTime = GetNowCount();			//基準時間を取得
+		TimeLimit = NORMAL_TIMELIMIT;		//制限時間を設定
+
+		//BGMが流れているなら
+		if (CheckSoundMem(START_BGM.handle) != 0)
+		{
+			StopSoundMem(START_BGM.handle);   //BGMを止める
+		}
+	}
+	//3キーを押したら、プレイシーンへ移動する(Hardモード)
+	else if (MY_KEY_DOWN(KEY_INPUT_3) == TRUE)
+	{
+		//プレイ画面に向けて準備
+		HaveMask = HARD_HAVE_MASK;			//マスクの上限個数の設定
+		GiveMask = HARD_GIVE_MASK_RANGE;	//上げるマスクのランダム数の設定
+		GameScene = GAME_SCENE_PLAY;		//プレイ画面に遷移
+		StartTime = GetNowCount();			//基準時間を取得
+		TimeLimit = HARD_TIMELIMIT;			//制限時間を設定
 
 		//BGMが流れているなら
 		if (CheckSoundMem(START_BGM.handle) != 0)
@@ -568,14 +611,14 @@ VOID MY_PLAY_PROC(VOID)
 			CountDown = FALSE;		//これ以降はこのif文は行わない
 		}
 
-		TimeLimit = 3 * 1000;  //3秒間のカウントダウンを行う
-		ElaTime = TimeLimit - (GetNowCount() - StartTime);
+		int NowCount = GetNowCount();
+		CDTimeLimit = 3 * 1000;  //3秒間のカウントダウンを行う
+		ElaTime = CDTimeLimit - (NowCount - StartTime);
 
 		////経過時間が0秒になったら(・・・3,2,1 で終了させるため <=)
 		if (ElaTime <= 0)
 		{
 			StartTime = GetNowCount();  //最初の問題用に基準時間を設定
-			TimeLimit = GAME_TIME;		//制限時間を設定
 			First_flg = FALSE;			//これ以降はカウントダウンは行わない
 		}
 	}
