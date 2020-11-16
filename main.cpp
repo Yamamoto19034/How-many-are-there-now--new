@@ -178,6 +178,7 @@ IMAGE ImageMessage2;    //お客様からのメッセージ(失敗パターン)
 
 //フォント
 FONT TANUKI;
+FONT CD_TANUKI;  //カウントダウン用のフォント
 
 //クリアか失敗か
 int Jude;
@@ -615,7 +616,7 @@ VOID MY_PLAY_PROC(VOID)
 		CDTimeLimit = 3 * 1000;  //3秒間のカウントダウンを行う
 		ElaTime = CDTimeLimit - (NowCount - StartTime);
 
-		////経過時間が0秒になったら(・・・3,2,1 で終了させるため <=)
+		////経過時間が0秒になったら(3,2,1 で終了させるため <=)
 		if (ElaTime <= 0)
 		{
 			StartTime = GetNowCount();  //最初の問題用に基準時間を設定
@@ -767,7 +768,7 @@ VOID MY_PLAY_DRAW(VOID)
 
 	if (First_flg)
 	{
-		DrawFormatStringToHandle(100, 200, GetColor(255, 0, 0), TANUKI.handle, "%d秒", (ElaTime / 1000) + 1);
+		DrawFormatStringToHandle(GAME_WIDTH / 2 - 125, GAME_HEIGHT / 2 - 120, GetColor(255, 0, 0), CD_TANUKI.handle, "%d", (ElaTime / 1000) + 1);
 	}
 	else 
 	{
@@ -777,7 +778,6 @@ VOID MY_PLAY_DRAW(VOID)
 		DrawFormatStringToHandle(0, 200, GetColor(255, 255, 255), TANUKI.handle, "%d秒", (ElaTime / 1000) + 1);
 	}
 
-	
 	//トークシーンの背景
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 192);  //透明度を25%上げる
 	DrawBox(0, GAME_HEIGHT - 180, GAME_WIDTH, GAME_HEIGHT, GetColor(0, 0, 0), TRUE);
@@ -1142,15 +1142,29 @@ BOOL MY_FONT_CREATE(VOID)
 	//フォントデータを作成
 	strcpy_s(TANUKI.path, sizeof(TANUKI.path), FONT_TANUKI_PATH);  //パスをコピー
 	strcpy_s(TANUKI.name, sizeof(TANUKI.name), FONT_TANUKI_NAME);  //フォント名をコピー
-	TANUKI.handle = -1;							//ハンドルを初期化
+	TANUKI.handle = -1;								//ハンドルを初期化
 	TANUKI.size = 50;								//サイズ: 50
 	TANUKI.bold = 4;								//太さ: 4
-	TANUKI.type = DX_FONTTYPE_ANTIALIASING_EDGE;   //アンチエイリアシング付き
+	TANUKI.type = DX_FONTTYPE_ANTIALIASING_EDGE;    //アンチエイリアシング付き
 
 	//フォントハンドル作成
 	TANUKI.handle = CreateFontToHandle(TANUKI.name, TANUKI.size, TANUKI.bold, TANUKI.type);
 	//フォントハンドルを作成できないときエラー
 	if (TANUKI.handle == -1) { MessageBox(GetMainWindowHandle(), FONT_TANUKI_NAME, FONT_CREATE_ERR_TITLE, MB_OK); return FALSE; }
+
+	//フォントデータを作成(カウントダウン用)
+	strcpy_s(CD_TANUKI.path, sizeof(CD_TANUKI.path), FONT_TANUKI_PATH);  //パスをコピー
+	strcpy_s(CD_TANUKI.name, sizeof(CD_TANUKI.name), FONT_TANUKI_NAME);  //フォント名をコピー
+	CD_TANUKI.handle = -1;								//ハンドルを初期化
+	CD_TANUKI.size = 300;								//サイズ: 300
+	CD_TANUKI.bold = 5;								    //太さ: 5
+	CD_TANUKI.type = DX_FONTTYPE_ANTIALIASING_EDGE;     //アンチエイリアシング付き
+
+	//フォントハンドル作成
+	CD_TANUKI.handle = CreateFontToHandle(CD_TANUKI.name, CD_TANUKI.size, CD_TANUKI.bold, CD_TANUKI.type);
+	//フォントハンドルを作成できないときエラー
+	if (CD_TANUKI.handle == -1) { MessageBox(GetMainWindowHandle(), FONT_TANUKI_NAME, FONT_CREATE_ERR_TITLE, MB_OK); return FALSE; }
+
 
 	return TRUE;
 }
