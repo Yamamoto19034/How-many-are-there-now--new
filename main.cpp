@@ -68,6 +68,7 @@
 #define MUSIC_PLAY_BGM_PATH		TEXT(".\\MUSIC\\game_maoudamashii_7_event34.mp3")  //プレイ画面のBGM
 #define MUSIC_END_CLEAR_PATH	TEXT(".\\MUSIC\\game_maoudamashii_7_event42.mp3")  //エンド画面(クリアパターン)の音楽
 #define MUSIC_END_FAIL_PATH		TEXT(".\\MUSIC\\game_maoudamashii_8_orgel05.mp3")  //エンド画面(失敗パターン)の音楽
+#define SOUND_EFFECT_TIME_PATH	TEXT(".\\MUSIC\\decision31.mp3")				   //時間が減っていく毎の効果音
 
 //エラーメッセージ
 #define MUSIC_LOAD_ERR_TITLE	TEXT("音楽読み込みエラー")
@@ -147,8 +148,8 @@ int GameScene;
 
 //マップチップ関連
 MAPCHIP animal[ANIMAL_MAX];
-int GHandle[ANIMAL_MAX];
-int order = 0;  //表示する順番を管理
+int GHandle[ANIMAL_MAX];		//ハンドルを保存する用の配列
+int order = 0;					//表示する順番を管理
 
 //マスク関連
 int Mask_num = 0;   //あげるマスクの個数
@@ -191,6 +192,7 @@ MUSIC START_BGM;		//スタート画面のBGM
 MUSIC PLAY_BGM;			//プレイ画面のBGM
 MUSIC END_CLEAR_BGM;	//エンド画面(クリアパターン)のBGM
 MUSIC END_FAIL_BGM;		//エンド画面(失敗パターン)のBGM
+MUSIC SF_TIME;			//時間が減っていく毎の効果音  (SF = SoundEffect)
 
 //プロトタイプ宣言
 VOID MY_FPS_UPDATE(VOID);			//FPS値を計測、更新する関数
@@ -622,6 +624,14 @@ VOID MY_PLAY_PROC(VOID)
 			StartTime = GetNowCount();  //最初の問題用に基準時間を設定
 			First_flg = FALSE;			//これ以降はカウントダウンは行わない
 		}
+		
+		//効果音が流れていないなら
+		if (CheckSoundMem(SF_TIME.handle) == 0)
+		{
+			//効果音の音量を下げる
+			ChangeVolumeSoundMem(255 * 50 / 100, SF_TIME.handle);  //50%の音量にする
+			PlaySoundMem(SF_TIME.handle, DX_PLAYTYPE_BACK);
+		}
 	}
 	else
 	{
@@ -630,6 +640,14 @@ VOID MY_PLAY_PROC(VOID)
 
 		//制限時間(降順で時間表示) - (現在の時間 - 基準の時間)、ミリ秒単位
 		ElaTime = TimeLimit - (NowCount - StartTime);
+
+		//効果音が流れていないなら
+		if (CheckSoundMem(SF_TIME.handle) == 0)
+		{
+			//効果音の音量を下げる
+			ChangeVolumeSoundMem(255 * 50 / 100, SF_TIME.handle);  //50%の音量にする
+			PlaySoundMem(SF_TIME.handle, DX_PLAYTYPE_BACK);
+		}
 
 		//経過時間が0秒になったら(・・・3,2,1 で終了させるため <=)
 		if (ElaTime <= 0)
@@ -954,7 +972,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 		GAME_animal1_CHIP_PATH,										//動物チップのパス
 		CHIP_DIV_NUM, GAME_animal1_DIV_TATE, GAME_animal1_DIV_YOKO, //分割する数
 		CHIP_DIV_WIDTH, CHIP_DIV_HEIGHT,							//画像を分割する幅と高さ
-		GHandle
+		GHandle														//ハンドルをここに保存する
 	);
 
 	//正しく分割できなかったら
@@ -1218,6 +1236,16 @@ BOOL MY_LOAD_MUSIC(VOID)
 	{
 		//エラーメッセージ表示
 		MessageBox(GetMainWindowHandle(), MUSIC_END_FAIL_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+
+	//時間用の効果音
+	strcpy_s(SF_TIME.path, SOUND_EFFECT_TIME_PATH);		//パスの設定
+	SF_TIME.handle = LoadSoundMem(SF_TIME.path);		//読み込み
+	if (SF_TIME.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), SOUND_EFFECT_TIME_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
 
