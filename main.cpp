@@ -1033,7 +1033,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 	}
 	GetGraphSize(ImageEndClear.handle, &ImageEndClear.width, &ImageEndClear.height);  //幅と高さを取得
 	ImageEndClear.x = GAME_WIDTH / 2 - ImageEndClear.width / 2;			//X位置を決める
-	ImageEndClear.y = GAME_HEIGHT / 2 - ImageEndClear.height / 2 - 75;  //Y位置を決める
+	ImageEndClear.y = GAME_HEIGHT / 2 - ImageEndClear.height / 2 - 135;  //Y位置を決める
 
 	//失敗の画像
 	strcpy_s(ImageEndFail.path, IMAGE_END_FAIL_PATH);  //パスの設定
@@ -1046,7 +1046,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 	}
 	GetGraphSize(ImageEndFail.handle, &ImageEndFail.width, &ImageEndFail.height);  //幅と高さを取得
 	ImageEndFail.x = GAME_WIDTH / 2 - ImageEndFail.width / 2;			//X位置を決める
-	ImageEndFail.y = GAME_HEIGHT / 2 - ImageEndFail.height / 2 - 75;    //Y位置を決める
+	ImageEndFail.y = GAME_HEIGHT / 2 - ImageEndFail.height / 2 - 135;    //Y位置を決める
 
 	//操作説明の1枚目の背景
 	strcpy_s(ImageMENU1.image.path, IMAGE_MENU_1_PATH);  //パスの設定
