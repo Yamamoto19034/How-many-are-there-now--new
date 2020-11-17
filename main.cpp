@@ -19,22 +19,22 @@
 #define NAME_MAX   255
 
 //エラーメッセージ
-#define IMAGE_LOAD_ERR_TITLE    TEXT("画像読み込みエラー")
+#define IMAGE_LOAD_ERR_TITLE			TEXT("画像読み込みエラー")
 
-//画像関連
-#define IMAGE_START_IMAGE_PATH  TEXT(".\\IMAGE\\スタート画面.png")  //背景(スタート画面)の画像
-#define IMAGE_PLAY_IMAGE_PATH   TEXT(".\\IMAGE\\森の中.png")		//背景(プレイ・エンド)の画像
-#define IMAGE_MENU_IMAGE_PATH   TEXT(".\\IMAGE\\操作説明.png")		//ボタンの画像
-#define IMAGE_MENU_BK_PATH      TEXT(".\\IMAGE\\menu_背景.png")		//背景(操作説明画面)の画像
-#define IMAGE_END_CLEAR_PATH	TEXT(".\\IMAGE\\GameClear.png")		//クリアの画像
-#define IMAGE_END_FAIL_PATH		TEXT(".\\IMAGE\\sippai.png")		//ゲームオーバーの画像
-#define IMAGE_MENU_1_PATH		TEXT(".\\IMAGE\\操作説明-1.png")	//操作説明の1枚目
-#define IMAGE_MENU_2_PATH		TEXT(".\\IMAGE\\操作説明-2.png")	//操作説明の2枚目
-#define IMAGE_MESSAGE_1_PATH	TEXT(".\\IMAGE\\message-1.png")		//お客様からのメッセージ(成功パターン)
-#define IMAGE_MESSAGE_2_PATH	TEXT(".\\IMAGE\\message-2.png")     //お客様からのメッセージ(失敗パターン)
+//画像関連	
+#define IMAGE_START_IMAGE_PATH			TEXT(".\\IMAGE\\スタート画面.png")  //背景(スタート画面)の画像
+#define IMAGE_PLAY_IMAGE_PATH			TEXT(".\\IMAGE\\森の中.png")		//背景(プレイ・エンド)の画像
+#define IMAGE_MENU_IMAGE_PATH			TEXT(".\\IMAGE\\操作説明.png")		//ボタンの画像
+#define IMAGE_MENU_BK_PATH				TEXT(".\\IMAGE\\menu_背景.png")		//背景(操作説明画面)の画像
+#define IMAGE_END_CLEAR_PATH			TEXT(".\\IMAGE\\GameClear.png")		//クリアの画像
+#define IMAGE_END_FAIL_PATH				TEXT(".\\IMAGE\\sippai.png")		//ゲームオーバーの画像
+#define IMAGE_MENU_1_PATH				TEXT(".\\IMAGE\\操作説明-1.png")	//操作説明の1枚目
+#define IMAGE_MENU_2_PATH				TEXT(".\\IMAGE\\操作説明-2.png")	//操作説明の2枚目
+#define IMAGE_MESSAGE_1_PATH			TEXT(".\\IMAGE\\message-1.png")		//お客様からのメッセージ(成功パターン)
+#define IMAGE_MESSAGE_2_PATH			TEXT(".\\IMAGE\\message-2.png")     //お客様からのメッセージ(失敗パターン)
 
 //動物チップ関連
-#define GAME_animal1_CHIP_PATH  TEXT(".\\IMAGE\\animal\\mapchip_1.png")  //チップの画像
+#define GAME_animal1_CHIP_PATH			TEXT(".\\IMAGE\\animal\\mapchip_1.png")  //チップの画像
 #define ANIMAL_MAX				4
 
 //画像分割関連
@@ -56,22 +56,23 @@
 #define FONT_PATH_MAX			255
 
 //フォント
-#define FONT_TANUKI_PATH		TEXT(".\\FONT\\TanukiMagic.ttf")
-#define FONT_TANUKI_NAME		TEXT("たぬき油性マジック")
+#define FONT_TANUKI_PATH				TEXT(".\\FONT\\TanukiMagic.ttf")
+#define FONT_TANUKI_NAME				TEXT("たぬき油性マジック")
 
 //フォントのエラーメッセージ
-#define FONT_INSTALL_ERR_TITLE	TEXT("フォントインストールエラー")
-#define FONT_CREATE_ERR_TITLE	TEXT("フォント作成エラー")
+#define FONT_INSTALL_ERR_TITLE			TEXT("フォントインストールエラー")
+#define FONT_CREATE_ERR_TITLE			TEXT("フォント作成エラー")
 
 //音楽のパス
-#define MUSIC_START_BGM_PATH	TEXT(".\\MUSIC\\game_maoudamashii_7_event43.mp3")  //スタート画面のBGM
-#define MUSIC_PLAY_BGM_PATH		TEXT(".\\MUSIC\\game_maoudamashii_7_event34.mp3")  //プレイ画面のBGM
-#define MUSIC_END_CLEAR_PATH	TEXT(".\\MUSIC\\game_maoudamashii_7_event42.mp3")  //エンド画面(クリアパターン)の音楽
-#define MUSIC_END_FAIL_PATH		TEXT(".\\MUSIC\\game_maoudamashii_8_orgel05.mp3")  //エンド画面(失敗パターン)の音楽
-#define SOUND_EFFECT_TIME_PATH	TEXT(".\\MUSIC\\decision31.mp3")				   //時間が減っていく毎の効果音
+#define MUSIC_START_BGM_PATH			TEXT(".\\MUSIC\\game_maoudamashii_7_event43.mp3")  //スタート画面のBGM
+#define MUSIC_PLAY_BGM_PATH				TEXT(".\\MUSIC\\game_maoudamashii_7_event34.mp3")  //プレイ画面のBGM
+#define MUSIC_END_CLEAR_PATH			TEXT(".\\MUSIC\\game_maoudamashii_7_event42.mp3")  //エンド画面(クリアパターン)の音楽
+#define MUSIC_END_FAIL_PATH				TEXT(".\\MUSIC\\game_maoudamashii_8_orgel05.mp3")  //エンド画面(失敗パターン)の音楽
+#define SOUND_EFFECT_TIME_PATH			TEXT(".\\MUSIC\\decision31.mp3")				   //時間が減っていく毎の効果音
+#define SOUND_EFFECT_BUTTON_PATH		TEXT(".\\MUSIC\\decision15.mp3")				   //ボタンを押した際の効果音
 
 //エラーメッセージ
-#define MUSIC_LOAD_ERR_TITLE	TEXT("音楽読み込みエラー")
+#define MUSIC_LOAD_ERR_TITLE			TEXT("音楽読み込みエラー")
 
 //各モードの制限時間  1000ミリ＝１秒
 #define EASY_TIMELIMIT				5 * 1000	//制限時間(Easyモード、5秒間)
@@ -193,6 +194,7 @@ MUSIC PLAY_BGM;			//プレイ画面のBGM
 MUSIC END_CLEAR_BGM;	//エンド画面(クリアパターン)のBGM
 MUSIC END_FAIL_BGM;		//エンド画面(失敗パターン)のBGM
 MUSIC SF_TIME;			//時間が減っていく毎の効果音  (SF = SoundEffect)
+MUSIC SF_BUTTON;		//ボタンを押した際の効果音
 
 //プロトタイプ宣言
 VOID MY_FPS_UPDATE(VOID);			//FPS値を計測、更新する関数
@@ -483,6 +485,13 @@ VOID MY_START_PROC(VOID)
 		{
 			StopSoundMem(START_BGM.handle);   //BGMを止める
 		}
+		//効果音が流れていないなら
+		if (CheckSoundMem(SF_BUTTON.handle) == 0)
+		{
+			//効果音の音量を下げる
+			ChangeVolumeSoundMem(255 * 50 / 100, SF_BUTTON.handle);  //50%の音量にする
+			PlaySoundMem(SF_BUTTON.handle, DX_PLAYTYPE_BACK);
+		}
 	}
 	//2キーを押したら、プレイシーンへ移動する(Normalモード)
 	else if (MY_KEY_DOWN(KEY_INPUT_2) == TRUE)
@@ -499,6 +508,13 @@ VOID MY_START_PROC(VOID)
 		{
 			StopSoundMem(START_BGM.handle);   //BGMを止める
 		}
+		//効果音が流れていないなら
+		if (CheckSoundMem(SF_BUTTON.handle) == 0)
+		{
+			//効果音の音量を下げる
+			ChangeVolumeSoundMem(255 * 50 / 100, SF_BUTTON.handle);  //50%の音量にする
+			PlaySoundMem(SF_BUTTON.handle, DX_PLAYTYPE_BACK);
+		}
 	}
 	//3キーを押したら、プレイシーンへ移動する(Hardモード)
 	else if (MY_KEY_DOWN(KEY_INPUT_3) == TRUE)
@@ -514,6 +530,13 @@ VOID MY_START_PROC(VOID)
 		if (CheckSoundMem(START_BGM.handle) != 0)
 		{
 			StopSoundMem(START_BGM.handle);   //BGMを止める
+		}
+		//効果音が流れていないなら
+		if (CheckSoundMem(SF_BUTTON.handle) == 0)
+		{
+			//効果音の音量を下げる
+			ChangeVolumeSoundMem(255 * 50 / 100, SF_BUTTON.handle);  //50%の音量にする
+			PlaySoundMem(SF_BUTTON.handle, DX_PLAYTYPE_BACK);
 		}
 	}
 
@@ -1249,6 +1272,16 @@ BOOL MY_LOAD_MUSIC(VOID)
 		return FALSE;
 	}
 
+	//ボタンの効果音
+	strcpy_s(SF_BUTTON.path, SOUND_EFFECT_BUTTON_PATH);		//パスの設定
+	SF_BUTTON.handle = LoadSoundMem(SF_BUTTON.path);		//読み込み
+	if (SF_BUTTON.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), SOUND_EFFECT_BUTTON_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+
 	return TRUE;
 }
 
@@ -1259,6 +1292,8 @@ VOID MY_DELETE_MUSIC(VOID)
 	DeleteSoundMem(PLAY_BGM.handle);
 	DeleteSoundMem(END_CLEAR_BGM.handle);
 	DeleteSoundMem(END_FAIL_BGM.handle);
+	DeleteSoundMem(SF_TIME.handle);
+	DeleteSoundMem(SF_BUTTON.handle);
 
 	return;
 }
