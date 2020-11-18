@@ -1,5 +1,5 @@
 /*--+----1----+----2----+----3----+----4----+----5-----+----6----+----7----+----8----+----9----+---*/
-//
+//あれ、今何個？
 
 //########## ヘッダーファイル読み込み ##########
 #include "DxLib.h"
@@ -23,6 +23,7 @@
 
 //画像関連	
 #define IMAGE_START_IMAGE_PATH			TEXT(".\\IMAGE\\スタート画面.png")  //背景(スタート画面)の画像
+#define IMAGE_TITLE_PATH				TEXT(".\\IMAGE\\title.png")			//タイトル画像
 #define IMAGE_PLAY_IMAGE_PATH			TEXT(".\\IMAGE\\森の中.png")		//背景(プレイ・エンド)の画像
 #define IMAGE_MENU_IMAGE_PATH			TEXT(".\\IMAGE\\操作説明.png")		//ボタンの画像
 #define IMAGE_MENU_BK_PATH				TEXT(".\\IMAGE\\menu_背景.png")		//背景(操作説明画面)の画像
@@ -171,6 +172,7 @@ BOOL CountDown = TRUE;  //カウントダウンをする際の基準時間を確保する
 
 //画像関連
 IMAGE ImageSTARTBK;		//ゲームの背景(スタート画面)
+IMAGE ImageTITLE;		//タイトル画像
 IMAGE ImagePLAYENDBK;	//ゲームの背景(プレイ・エンド画面)
 IMAGE ImageMENUBtn;		//ボタンの画像
 IMAGE ImageMENUBK;		//ゲームの背景(説明画面)
@@ -560,6 +562,7 @@ VOID MY_START_DRAW(VOID)
 {
 	//背景を描画する
 	DrawGraph(ImageSTARTBK.x, ImageSTARTBK.y, ImageSTARTBK.handle, TRUE);
+	DrawGraph(ImageTITLE.x, ImageTITLE.y, ImageTITLE.handle, TRUE);
 
 	//操作説明画面へ促すボタン
 	DrawGraph(ImageMENUBtn.x, ImageMENUBtn.y, ImageMENUBtn.handle, TRUE);
@@ -962,6 +965,19 @@ BOOL MY_LOAD_IMAGE(VOID)
 	ImageSTARTBK.x = GAME_WIDTH / 2 - ImageSTARTBK.width / 2;		//X位置を決める
 	ImageSTARTBK.y = GAME_HEIGHT / 2 - ImageSTARTBK.height / 2;     //Y位置を決める
 
+	//タイトル画像
+	strcpy_s(ImageTITLE.path, IMAGE_TITLE_PATH);  //パスの設定
+	ImageTITLE.handle = LoadGraph(ImageTITLE.path);   //読み込み
+	if (ImageTITLE.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), IMAGE_TITLE_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImageTITLE.handle, &ImageTITLE.width, &ImageTITLE.height);  //幅と高さを取得
+	ImageTITLE.x = GAME_WIDTH / 2 - ImageTITLE.width / 2;		//X位置を決める
+	ImageTITLE.y = 25;											//Y位置を決める
+
 	//プレイ画面とエンド画面の背景画像
 	strcpy_s(ImagePLAYENDBK.path, IMAGE_PLAY_IMAGE_PATH);  //パスの設定
 	ImagePLAYENDBK.handle = LoadGraph(ImagePLAYENDBK.path);   //読み込み
@@ -1124,7 +1140,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 	}
 	GetGraphSize(ImageEasyMode.handle, &ImageEasyMode.width, &ImageEasyMode.height);  //幅と高さを取得
 	ImageEasyMode.x = GAME_WIDTH / 2 - ImageEasyMode.width / 2;			//X位置を決める
-	ImageEasyMode.y = ImageEasyMode.y + ImageEasyMode.height;			//Y位置を決める
+	ImageEasyMode.y = ImageTITLE.y + ImageTITLE.height + 15;			//Y位置を決める
 
 	//Normalモードへ促すためのボタン
 	strcpy_s(ImageNormalMode.path, IMAGE_NORMALMODE_PATH);  //パスの設定
@@ -1137,7 +1153,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 	}
 	GetGraphSize(ImageNormalMode.handle, &ImageNormalMode.width, &ImageNormalMode.height);  //幅と高さを取得
 	ImageNormalMode.x = GAME_WIDTH / 2 - ImageNormalMode.width / 2;			//X位置を決める
-	ImageNormalMode.y = ImageEasyMode.y + ImageNormalMode.height;			//Y位置を決める
+	ImageNormalMode.y = ImageEasyMode.y + ImageEasyMode.height + 15;			//Y位置を決める
 
 	//Hardモードへ促すためのボタン
 	strcpy_s(ImageHardMode.path, IMAGE_HARDMODE_PATH);  //パスの設定
@@ -1150,7 +1166,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 	}
 	GetGraphSize(ImageHardMode.handle, &ImageHardMode.width, &ImageHardMode.height);  //幅と高さを取得
 	ImageHardMode.x = GAME_WIDTH / 2 - ImageHardMode.width / 2;			//X位置を決める
-	ImageHardMode.y = ImageNormalMode.y + ImageHardMode.height;				//Y位置を決める
+	ImageHardMode.y = ImageNormalMode.y + ImageNormalMode.height + 15;				//Y位置を決める
 
 	return TRUE;
 }
@@ -1159,6 +1175,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 VOID MY_DELETE_IMAGE(VOID)
 {
 	DeleteGraph(ImageSTARTBK.handle);		//スタート画面の背景
+	DeleteGraph(ImageTITLE.handle);			//タイトル画像
 	DeleteGraph(ImagePLAYENDBK.handle);		//プレイ・エンド画面の背景
 	DeleteGraph(ImageMENUBtn.handle);		//ボタン
 	DeleteGraph(ImageMENUBK.handle);        //操作説明画面の背景
@@ -1180,6 +1197,10 @@ VOID MY_DELETE_IMAGE(VOID)
 	//メッセージの画像
 	DeleteGraph(ImageMessage1.handle);
 	DeleteGraph(ImageMessage2.handle);
+
+	DeleteGraph(ImageEasyMode.handle);
+	DeleteGraph(ImageNormalMode.handle);
+	DeleteGraph(ImageHardMode.handle);
 
 	return;
 }
