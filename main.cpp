@@ -830,7 +830,10 @@ VOID MY_PLAY_DRAW(VOID)
 		//制限時間の表示
 		//1000で割って「ミリ秒単位」から「秒単位」に
 		//0 が出てきてしまうので +1する
-		DrawFormatStringToHandle(0, 200, GetColor(255, 255, 255), TANUKI.handle, "%d秒", (ElaTime / 1000) + 1);
+		if((ElaTime / 1000 + 1) <= 3)
+			DrawFormatStringToHandle(0, 0, GetColor(255, 0, 0), TANUKI.handle, "%d秒", (ElaTime / 1000) + 1);
+		else
+			DrawFormatStringToHandle(0, 0, GetColor(255, 255, 255), TANUKI.handle, "%d秒", (ElaTime / 1000) + 1);
 	}
 
 	//トークシーンの背景
@@ -853,7 +856,9 @@ VOID MY_PLAY_DRAW(VOID)
 
 			//欲しいマスクの表示
 			DrawFormatStringToHandle(170, GAME_HEIGHT - 170, GetColor(255, 255, 255), TANUKI.handle, "マスク %d個 ちょうだい！！", Mask_num);
-			DrawFormatStringToHandle(0, 0, GetColor(255, 255, 255), TANUKI.handle, "%d個", Mask_sum);
+
+			//デバッグ用
+			//DrawFormatStringToHandle(0, 0, GetColor(255, 255, 255), TANUKI.handle, "%d個", Mask_sum);
 
 			//「あげる？」「あげない？」の追加
 			DrawBox(200, GAME_HEIGHT - 100, 410, GAME_HEIGHT - 50, GetColor(255, 0, 0), TRUE);
