@@ -32,6 +32,9 @@
 #define IMAGE_MENU_2_PATH				TEXT(".\\IMAGE\\操作説明-2.png")	//操作説明の2枚目
 #define IMAGE_MESSAGE_1_PATH			TEXT(".\\IMAGE\\message-1.png")		//お客様からのメッセージ(成功パターン)
 #define IMAGE_MESSAGE_2_PATH			TEXT(".\\IMAGE\\message-2.png")     //お客様からのメッセージ(失敗パターン)
+#define IMAGE_EASYMODE_PATH				TEXT(".\\IMAGE\\Easy.png")			//Easyモードへ促すためのボタン
+#define IMAGE_NORMALMODE_PATH			TEXT(".\\IMAGE\\Normal.png")		//Normalモードへ促すためのボタン
+#define IMAGE_HARDMODE_PATH				TEXT(".\\IMAGE\\Hard.png")			//Hardモードへ促すためのボタン
 
 //動物チップ関連
 #define GAME_animal1_CHIP_PATH			TEXT(".\\IMAGE\\animal\\mapchip_1.png")  //チップの画像
@@ -177,6 +180,9 @@ IMAGE_MENU ImageMENU1;	//操作説明の1枚目
 IMAGE_MENU ImageMENU2;  //操作説明の2枚目
 IMAGE ImageMessage1;	//お客様からのメッセージ(成功パターン)
 IMAGE ImageMessage2;    //お客様からのメッセージ(失敗パターン)
+IMAGE ImageEasyMode;	//Easyモードへ促すためのボタン
+IMAGE ImageNormalMode;	//Normalモードへ促すためのボタン
+IMAGE ImageHardMode;	//Hardモードへ促すためのボタン
 
 //フォント
 FONT TANUKI;
@@ -557,6 +563,11 @@ VOID MY_START_DRAW(VOID)
 
 	//操作説明画面へ促すボタン
 	DrawGraph(ImageMENUBtn.x, ImageMENUBtn.y, ImageMENUBtn.handle, TRUE);
+
+	//各モードの描画
+	DrawGraph(ImageEasyMode.x, ImageEasyMode.y, ImageEasyMode.handle, TRUE);
+	DrawGraph(ImageNormalMode.x, ImageNormalMode.y, ImageNormalMode.handle, TRUE);
+	DrawGraph(ImageHardMode.x, ImageHardMode.y, ImageHardMode.handle, TRUE);
 
 	return;
 }
@@ -1101,6 +1112,45 @@ BOOL MY_LOAD_IMAGE(VOID)
 	GetGraphSize(ImageMessage2.handle, &ImageMessage2.width, &ImageMessage2.height);  //幅と高さを取得
 	ImageMessage2.x = GAME_WIDTH / 2 - ImageMessage2.width / 2;			//X位置を決める
 	ImageMessage2.y = ImageEndFail.y + ImageEndFail.height;				//Y位置を決める
+
+	//Easyモードへ促すためのボタン
+	strcpy_s(ImageEasyMode.path, IMAGE_EASYMODE_PATH);  //パスの設定
+	ImageEasyMode.handle = LoadGraph(ImageEasyMode.path);   //読み込み
+	if (ImageEasyMode.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), IMAGE_EASYMODE_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImageEasyMode.handle, &ImageEasyMode.width, &ImageEasyMode.height);  //幅と高さを取得
+	ImageEasyMode.x = GAME_WIDTH / 2 - ImageEasyMode.width / 2;			//X位置を決める
+	ImageEasyMode.y = ImageEasyMode.y + ImageEasyMode.height;			//Y位置を決める
+
+	//Normalモードへ促すためのボタン
+	strcpy_s(ImageNormalMode.path, IMAGE_NORMALMODE_PATH);  //パスの設定
+	ImageNormalMode.handle = LoadGraph(ImageNormalMode.path);   //読み込み
+	if (ImageNormalMode.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), IMAGE_NORMALMODE_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImageNormalMode.handle, &ImageNormalMode.width, &ImageNormalMode.height);  //幅と高さを取得
+	ImageNormalMode.x = GAME_WIDTH / 2 - ImageNormalMode.width / 2;			//X位置を決める
+	ImageNormalMode.y = ImageEasyMode.y + ImageNormalMode.height;			//Y位置を決める
+
+	//Hardモードへ促すためのボタン
+	strcpy_s(ImageHardMode.path, IMAGE_HARDMODE_PATH);  //パスの設定
+	ImageHardMode.handle = LoadGraph(ImageHardMode.path);   //読み込み
+	if (ImageHardMode.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), IMAGE_HARDMODE_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImageHardMode.handle, &ImageHardMode.width, &ImageHardMode.height);  //幅と高さを取得
+	ImageHardMode.x = GAME_WIDTH / 2 - ImageHardMode.width / 2;			//X位置を決める
+	ImageHardMode.y = ImageNormalMode.y + ImageHardMode.height;				//Y位置を決める
 
 	return TRUE;
 }
