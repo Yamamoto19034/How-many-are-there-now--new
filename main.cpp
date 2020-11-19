@@ -5,28 +5,28 @@
 #include "DxLib.h"
 
 //########## マクロ定義 ##########
-#define GAME_WIDTH	1000	//画面の横の大きさ
-#define GAME_HEIGHT	700		//画面の縦の大きさ
-#define GAME_COLOR	32		//画面のカラービット
+#define GAME_WIDTH						1000	//画面の横の大きさ
+#define GAME_HEIGHT						700		//画面の縦の大きさ
+#define GAME_COLOR						32		//画面のカラービット
 
-#define GAME_WINDOW_BAR	0					//タイトルバーはデフォルトにする
-#define GAME_WINDOW_NAME	"あれ、今何個？"	//ウィンドウのタイトル
+#define GAME_WINDOW_BAR					0					//タイトルバーはデフォルトにする
+#define GAME_WINDOW_NAME				"あれ、今何個？"	//ウィンドウのタイトル
 
-#define GAME_FPS	60  //FPSの数値
+#define GAME_FPS						60  //FPSの数値
 
 //パスの長さ
-#define PATH_MAX   255
-#define NAME_MAX   255
+#define PATH_MAX						255
+#define NAME_MAX						255
 
 //エラーメッセージ
 #define IMAGE_LOAD_ERR_TITLE			TEXT("画像読み込みエラー")
 
 //画像関連	
-#define IMAGE_START_IMAGE_PATH			TEXT(".\\IMAGE\\スタート画面.png")  //背景(スタート画面)の画像
+#define IMAGE_START_BG_PATH				TEXT(".\\IMAGE\\スタート画面.png")  //背景(スタート画面)の画像
 #define IMAGE_TITLE_PATH				TEXT(".\\IMAGE\\title.png")			//タイトル画像
-#define IMAGE_PLAY_IMAGE_PATH			TEXT(".\\IMAGE\\森の中.png")		//背景(プレイ・エンド)の画像
-#define IMAGE_MENU_IMAGE_PATH			TEXT(".\\IMAGE\\操作説明.png")		//ボタンの画像(ルール説明行き)
-#define IMAGE_MENU_BK_PATH				TEXT(".\\IMAGE\\menu_背景.png")		//背景(操作説明画面)の画像
+#define IMAGE_PLAY_BG_PATH				TEXT(".\\IMAGE\\森の中.png")		//背景(プレイ・エンド)の画像
+#define IMAGE_MENU_BUTTON_PATH			TEXT(".\\IMAGE\\操作説明.png")		//ボタンの画像(ルール説明行き)
+#define IMAGE_MENU_BG_PATH				TEXT(".\\IMAGE\\menu_背景.png")		//背景(操作説明画面・ルール説明画面)の画像
 #define IMAGE_END_CLEAR_PATH			TEXT(".\\IMAGE\\GameClear.png")		//クリアの画像
 #define IMAGE_END_FAIL_PATH				TEXT(".\\IMAGE\\sippai.png")		//ゲームオーバーの画像
 #define IMAGE_MENU_1_PATH				TEXT(".\\IMAGE\\操作説明-1.png")	//操作説明の1枚目
@@ -41,25 +41,25 @@
 
 //動物チップ関連
 #define GAME_animal1_CHIP_PATH			TEXT(".\\IMAGE\\animal\\mapchip_1.png")  //チップの画像
-#define ANIMAL_MAX				4
+#define ANIMAL_MAX						4
 
 //画像分割関連
-#define CHIP_DIV_WIDTH			565   //画像を分割する幅サイズ
-#define CHIP_DIV_HEIGHT			660   //画像を分割する高さサイズ
-#define GAME_animal1_DIV_TATE   2     //画像を縦に分割する数
-#define GAME_animal1_DIV_YOKO   2     //画像を横に分割する数
+#define CHIP_DIV_WIDTH					565   //画像を分割する幅サイズ
+#define CHIP_DIV_HEIGHT					660   //画像を分割する高さサイズ
+#define GAME_animal1_DIV_TATE			2     //画像を縦に分割する数
+#define GAME_animal1_DIV_YOKO			2     //画像を横に分割する数
 #define CHIP_DIV_NUM GAME_animal1_DIV_TATE * GAME_animal1_DIV_YOKO  //画像を分割する総数
 
 //マスク関連
-#define EASY_HAVE_MASK				20		//マスクの上限(Easyモード、20個)
-#define NORMAL_HAVE_MASK			50		//マスクの上限(Normalモード、50個)
-#define HARD_HAVE_MASK				100		//マスクの上限(Hardモード、100個)
-#define EASY_GIVE_MASK_RANGE		4		//マスクのランダム数(Easyモード、0～4)
-#define NORMAL_GIVE_MASK_RANGE		10		//マスクのランダム数(Normalモード、0～9)
-#define HARD_GIVE_MASK_RANGE		20		//マスクのランダム数(Hardモード、0～19)
+#define EASY_HAVE_MASK					20		//マスクの上限(Easyモード、20個)
+#define NORMAL_HAVE_MASK				50		//マスクの上限(Normalモード、50個)
+#define HARD_HAVE_MASK					100		//マスクの上限(Hardモード、100個)
+#define EASY_GIVE_MASK_RANGE			4		//マスクのランダム数(Easyモード、0～4)
+#define NORMAL_GIVE_MASK_RANGE			10		//マスクのランダム数(Normalモード、0～9)
+#define HARD_GIVE_MASK_RANGE			20		//マスクのランダム数(Hardモード、0～19)
 
 //フォントのパスの長さ
-#define FONT_PATH_MAX			255
+#define FONT_PATH_MAX					255
 
 //フォント
 #define FONT_TANUKI_PATH				TEXT(".\\FONT\\TanukiMagic.ttf")
@@ -81,9 +81,9 @@
 #define MUSIC_LOAD_ERR_TITLE			TEXT("音楽読み込みエラー")
 
 //各モードの制限時間  1000ミリ＝１秒
-#define EASY_TIMELIMIT				5 * 1000	//制限時間(Easyモード、5秒間)
-#define NORMAL_TIMELIMIT			10 * 1000	//制限時間(Normalモード、10秒間)
-#define HARD_TIMELIMIT				15 * 1000	//制限時間(Hardモード、15秒間)
+#define EASY_TIMELIMIT					5 * 1000	//制限時間(Easyモード、5秒間)
+#define NORMAL_TIMELIMIT				10 * 1000	//制限時間(Normalモード、10秒間)
+#define HARD_TIMELIMIT					15 * 1000	//制限時間(Hardモード、15秒間)
 
 enum GAME_SCENE {
 	GAME_SCENE_START,  //スタート画面
@@ -174,11 +174,11 @@ BOOL First_flg = TRUE;  //ゲームに入る際のカウントダウンをする
 BOOL CountDown = TRUE;  //カウントダウンをする際の基準時間を確保する
 
 //画像関連
-IMAGE ImageSTARTBK;		//ゲームの背景(スタート画面)
+IMAGE ImageSTARTBG;		//ゲームの背景(スタート画面)
 IMAGE ImageTITLE;		//タイトル画像
-IMAGE ImagePLAYENDBK;	//ゲームの背景(プレイ・エンド画面)
+IMAGE ImagePLAYENDBG;	//ゲームの背景(プレイ・エンド画面)
 IMAGE ImageMENUBtn;		//ボタンの画像(ルール説明行き)
-IMAGE ImageMENUBK;		//ゲームの背景(説明画面)
+IMAGE ImageMENUBG;		//ゲームの背景(説明画面)
 IMAGE ImageEndClear;	//クリアの画像
 IMAGE ImageEndFail;		//失敗の画像
 IMAGE_MENU ImageMENU1;	//操作説明の1枚目
@@ -309,7 +309,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			MY_MENU();    //操作説明画面
 			break;
 		case GAME_SCENE_LEVEL:
-			MY_LEVEL();
+			MY_LEVEL();	  //level説明画面
 			break;
 		}
 
@@ -579,7 +579,7 @@ VOID MY_START_PROC(VOID)
 VOID MY_START_DRAW(VOID)
 {
 	//背景を描画する
-	DrawGraph(ImageSTARTBK.x, ImageSTARTBK.y, ImageSTARTBK.handle, TRUE);
+	DrawGraph(ImageSTARTBG.x, ImageSTARTBG.y, ImageSTARTBG.handle, TRUE);
 	DrawGraph(ImageTITLE.x, ImageTITLE.y, ImageTITLE.handle, TRUE);
 
 	//操作説明画面へ促すボタン
@@ -635,7 +635,7 @@ VOID MY_MENU_PROC(VOID)
 VOID MY_MENU_DRAW(VOID)
 {
 	//背景を描画する
-	DrawGraph(ImageMENUBK.x, ImageMENUBK.y, ImageMENUBK.handle, TRUE);
+	DrawGraph(ImageMENUBG.x, ImageMENUBG.y, ImageMENUBG.handle, TRUE);
 
 	if (ImageMENU1.IsDraw == TRUE)  //説明画像の1枚目
 		DrawGraph(ImageMENU1.image.x, ImageMENU1.image.y, ImageMENU1.image.handle, TRUE);
@@ -670,7 +670,7 @@ VOID MY_LEVEL_PROC(VOID)
 VOID MY_LEVEL_DRAW(VOID)
 {
 	//背景の描画
-	DrawGraph(ImageMENUBK.x, ImageMENUBK.y, ImageMENUBK.handle, TRUE);
+	DrawGraph(ImageMENUBG.x, ImageMENUBG.y, ImageMENUBG.handle, TRUE);
 
 	//level説明の描画
 	DrawGraph(ImageLEVELExp.x, ImageLEVELExp.y, ImageLEVELExp.handle, TRUE);
@@ -874,7 +874,7 @@ VOID MY_PLAY_PROC(VOID)
 VOID MY_PLAY_DRAW(VOID)
 {
 	//プレイ画面の背景
-	DrawGraph(ImagePLAYENDBK.x, ImagePLAYENDBK.y, ImagePLAYENDBK.handle, TRUE);
+	DrawGraph(ImagePLAYENDBG.x, ImagePLAYENDBG.y, ImagePLAYENDBG.handle, TRUE);
 
 	if (First_flg)
 	{
@@ -988,7 +988,7 @@ VOID MY_END_PROC(VOID)
 VOID MY_END_DRAW(VOID)
 {
 	//背景を描画
-	DrawGraph(ImagePLAYENDBK.x, ImagePLAYENDBK.y, ImagePLAYENDBK.handle, TRUE);
+	DrawGraph(ImagePLAYENDBG.x, ImagePLAYENDBG.y, ImagePLAYENDBG.handle, TRUE);
 
 	//成功、失敗に応じて表示する画像を変更
 	switch (Jude)
@@ -1013,17 +1013,17 @@ VOID MY_END_DRAW(VOID)
 BOOL MY_LOAD_IMAGE(VOID)
 {
 	//スタート画面の背景画像
-	strcpy_s(ImageSTARTBK.path, IMAGE_START_IMAGE_PATH);  //パスの設定
-	ImageSTARTBK.handle = LoadGraph(ImageSTARTBK.path);   //読み込み
-	if (ImageSTARTBK.handle == -1)
+	strcpy_s(ImageSTARTBG.path, IMAGE_START_BG_PATH);  //パスの設定
+	ImageSTARTBG.handle = LoadGraph(ImageSTARTBG.path);   //読み込み
+	if (ImageSTARTBG.handle == -1)
 	{
 		//エラーメッセージ表示
-		MessageBox(GetMainWindowHandle(), IMAGE_START_IMAGE_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		MessageBox(GetMainWindowHandle(), IMAGE_START_BG_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(ImageSTARTBK.handle, &ImageSTARTBK.width, &ImageSTARTBK.height);  //幅と高さを取得
-	ImageSTARTBK.x = GAME_WIDTH / 2 - ImageSTARTBK.width / 2;		//X位置を決める
-	ImageSTARTBK.y = GAME_HEIGHT / 2 - ImageSTARTBK.height / 2;     //Y位置を決める
+	GetGraphSize(ImageSTARTBG.handle, &ImageSTARTBG.width, &ImageSTARTBG.height);  //幅と高さを取得
+	ImageSTARTBG.x = GAME_WIDTH / 2 - ImageSTARTBG.width / 2;		//X位置を決める
+	ImageSTARTBG.y = GAME_HEIGHT / 2 - ImageSTARTBG.height / 2;     //Y位置を決める
 
 	//タイトル画像
 	strcpy_s(ImageTITLE.path, IMAGE_TITLE_PATH);  //パスの設定
@@ -1039,25 +1039,25 @@ BOOL MY_LOAD_IMAGE(VOID)
 	ImageTITLE.y = 25;											//Y位置を決める
 
 	//プレイ画面とエンド画面の背景画像
-	strcpy_s(ImagePLAYENDBK.path, IMAGE_PLAY_IMAGE_PATH);  //パスの設定
-	ImagePLAYENDBK.handle = LoadGraph(ImagePLAYENDBK.path);   //読み込み
-	if (ImagePLAYENDBK.handle == -1)
+	strcpy_s(ImagePLAYENDBG.path, IMAGE_PLAY_BG_PATH);  //パスの設定
+	ImagePLAYENDBG.handle = LoadGraph(ImagePLAYENDBG.path);   //読み込み
+	if (ImagePLAYENDBG.handle == -1)
 	{
 		//エラーメッセージ表示
-		MessageBox(GetMainWindowHandle(), IMAGE_PLAY_IMAGE_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		MessageBox(GetMainWindowHandle(), IMAGE_PLAY_BG_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(ImagePLAYENDBK.handle, &ImagePLAYENDBK.width, &ImagePLAYENDBK.height);  //幅と高さを取得
-	ImagePLAYENDBK.x = GAME_WIDTH / 2 - ImagePLAYENDBK.width / 2;	//X位置を決める
-	ImagePLAYENDBK.y = GAME_HEIGHT / 2 - ImagePLAYENDBK.height / 2; //Y位置を決める
+	GetGraphSize(ImagePLAYENDBG.handle, &ImagePLAYENDBG.width, &ImagePLAYENDBG.height);  //幅と高さを取得
+	ImagePLAYENDBG.x = GAME_WIDTH / 2 - ImagePLAYENDBG.width / 2;	//X位置を決める
+	ImagePLAYENDBG.y = GAME_HEIGHT / 2 - ImagePLAYENDBG.height / 2; //Y位置を決める
 
 	//ボタンの画像(ルール説明行き)
-	strcpy_s(ImageMENUBtn.path, IMAGE_MENU_IMAGE_PATH);  //パスの設定
+	strcpy_s(ImageMENUBtn.path, IMAGE_MENU_BUTTON_PATH);  //パスの設定
 	ImageMENUBtn.handle = LoadGraph(ImageMENUBtn.path);   //読み込み
 	if (ImageMENUBtn.handle == -1)
 	{
 		//エラーメッセージ表示
-		MessageBox(GetMainWindowHandle(), IMAGE_MENU_IMAGE_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		MessageBox(GetMainWindowHandle(), IMAGE_MENU_BUTTON_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
 	GetGraphSize(ImageMENUBtn.handle, &ImageMENUBtn.width, &ImageMENUBtn.height);  //幅と高さを取得
@@ -1065,17 +1065,17 @@ BOOL MY_LOAD_IMAGE(VOID)
 	ImageMENUBtn.y = GAME_HEIGHT - ImageMENUBtn.height - 20;		//Y位置を決める
 
 	//操作説明画面の背景
-	strcpy_s(ImageMENUBK.path, IMAGE_MENU_BK_PATH);  //パスの設定
-	ImageMENUBK.handle = LoadGraph(ImageMENUBK.path);   //読み込み
-	if (ImageMENUBK.handle == -1)
+	strcpy_s(ImageMENUBG.path, IMAGE_MENU_BG_PATH);  //パスの設定
+	ImageMENUBG.handle = LoadGraph(ImageMENUBG.path);   //読み込み
+	if (ImageMENUBG.handle == -1)
 	{
 		//エラーメッセージ表示
-		MessageBox(GetMainWindowHandle(), IMAGE_MENU_BK_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		MessageBox(GetMainWindowHandle(), IMAGE_MENU_BG_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(ImageMENUBK.handle, &ImageMENUBK.width, &ImageMENUBK.height);  //幅と高さを取得
-	ImageMENUBK.x = GAME_WIDTH / 2 - ImageMENUBK.width / 2;			//X位置を決める
-	ImageMENUBK.y = GAME_HEIGHT / 2 - ImageMENUBK.height / 2;		//Y位置を決める
+	GetGraphSize(ImageMENUBG.handle, &ImageMENUBG.width, &ImageMENUBG.height);  //幅と高さを取得
+	ImageMENUBG.x = GAME_WIDTH / 2 - ImageMENUBG.width / 2;			//X位置を決める
+	ImageMENUBG.y = GAME_HEIGHT / 2 - ImageMENUBG.height / 2;		//Y位置を決める
 
 	//動物チップ
 	int animalRes = LoadDivGraph(
@@ -1260,11 +1260,11 @@ BOOL MY_LOAD_IMAGE(VOID)
 //画像をまとめて削除する関数
 VOID MY_DELETE_IMAGE(VOID)
 {
-	DeleteGraph(ImageSTARTBK.handle);		//スタート画面の背景
+	DeleteGraph(ImageSTARTBG.handle);		//スタート画面の背景
 	DeleteGraph(ImageTITLE.handle);			//タイトル画像
-	DeleteGraph(ImagePLAYENDBK.handle);		//プレイ・エンド画面の背景
+	DeleteGraph(ImagePLAYENDBG.handle);		//プレイ・エンド画面の背景
 	DeleteGraph(ImageMENUBtn.handle);		//ボタン
-	DeleteGraph(ImageMENUBK.handle);        //操作説明画面の背景
+	DeleteGraph(ImageMENUBG.handle);        //操作説明画面の背景
 
 	//動物チップ
 	for (int i_num = 0; i_num < CHIP_DIV_NUM; i_num++)
