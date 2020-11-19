@@ -25,7 +25,7 @@
 #define IMAGE_START_IMAGE_PATH			TEXT(".\\IMAGE\\スタート画面.png")  //背景(スタート画面)の画像
 #define IMAGE_TITLE_PATH				TEXT(".\\IMAGE\\title.png")			//タイトル画像
 #define IMAGE_PLAY_IMAGE_PATH			TEXT(".\\IMAGE\\森の中.png")		//背景(プレイ・エンド)の画像
-#define IMAGE_MENU_IMAGE_PATH			TEXT(".\\IMAGE\\操作説明.png")		//ボタンの画像
+#define IMAGE_MENU_IMAGE_PATH			TEXT(".\\IMAGE\\操作説明.png")		//ボタンの画像(ルール説明行き)
 #define IMAGE_MENU_BK_PATH				TEXT(".\\IMAGE\\menu_背景.png")		//背景(操作説明画面)の画像
 #define IMAGE_END_CLEAR_PATH			TEXT(".\\IMAGE\\GameClear.png")		//クリアの画像
 #define IMAGE_END_FAIL_PATH				TEXT(".\\IMAGE\\sippai.png")		//ゲームオーバーの画像
@@ -36,6 +36,8 @@
 #define IMAGE_EASYMODE_PATH				TEXT(".\\IMAGE\\Easy.png")			//Easyモードへ促すためのボタン
 #define IMAGE_NORMALMODE_PATH			TEXT(".\\IMAGE\\Normal.png")		//Normalモードへ促すためのボタン
 #define IMAGE_HARDMODE_PATH				TEXT(".\\IMAGE\\Hard.png")			//Hardモードへ促すためのボタン
+#define IMAGE_LEVEL_BUTTON_PATH			TEXT(".\\IMAGE\\level説明.png")		//ボタンの画像(level説明行き)
+#define IMAGE_LEVEL_EXP_PATH			TEXT(".\\IMAGE\\level説明画像.png") //level説明
 
 //動物チップ関連
 #define GAME_animal1_CHIP_PATH			TEXT(".\\IMAGE\\animal\\mapchip_1.png")  //チップの画像
@@ -87,7 +89,8 @@ enum GAME_SCENE {
 	GAME_SCENE_START,  //スタート画面
 	GAME_SCENE_PLAY,   //プレイ画面
 	GAME_SCENE_END,    //エンド画面
-	GAME_SCENE_MENU    //操作説明画面
+	GAME_SCENE_MENU,   //操作説明画面
+	GAME_SCENE_LEVEL,  //level説明画面
 };   //ゲームのシーン
 
 enum GAME_JUDE {
@@ -174,7 +177,7 @@ BOOL CountDown = TRUE;  //カウントダウンをする際の基準時間を確保する
 IMAGE ImageSTARTBK;		//ゲームの背景(スタート画面)
 IMAGE ImageTITLE;		//タイトル画像
 IMAGE ImagePLAYENDBK;	//ゲームの背景(プレイ・エンド画面)
-IMAGE ImageMENUBtn;		//ボタンの画像
+IMAGE ImageMENUBtn;		//ボタンの画像(ルール説明行き)
 IMAGE ImageMENUBK;		//ゲームの背景(説明画面)
 IMAGE ImageEndClear;	//クリアの画像
 IMAGE ImageEndFail;		//失敗の画像
@@ -185,6 +188,8 @@ IMAGE ImageMessage2;    //お客様からのメッセージ(失敗パターン)
 IMAGE ImageEasyMode;	//Easyモードへ促すためのボタン
 IMAGE ImageNormalMode;	//Normalモードへ促すためのボタン
 IMAGE ImageHardMode;	//Hardモードへ促すためのボタン
+IMAGE ImageLEVELBtn;	//ボタンの画像(level説明行き)
+IMAGE ImageLEVELExp;	//level説明
 
 //フォント
 FONT TANUKI;
@@ -219,6 +224,14 @@ VOID MY_START(VOID);				//スタート画面
 VOID MY_START_PROC(VOID);			//スタート画面の処理
 VOID MY_START_DRAW(VOID);			//スタート画面の描画
 
+VOID MY_MENU(VOID);					//操作説明画面
+VOID MY_MENU_PROC(VOID);			//操作説明画面の処理
+VOID MY_MENU_DRAW(VOID);			//操作説明画面の描画
+
+VOID MY_LEVEL(VOID);				//level説明画面
+VOID MY_LEVEL_PROC(VOID);			//level説明画面の処理
+VOID MY_LEVEL_DRAW(VOID);			//level説明画面の描画
+
 VOID MY_PLAY(VOID);					//プレイ画面
 VOID MY_PLAY_PROC(VOID);			//プレイ画面の処理
 VOID MY_PLAY_DRAW(VOID);			//プレイ画面の描画
@@ -226,10 +239,6 @@ VOID MY_PLAY_DRAW(VOID);			//プレイ画面の描画
 VOID MY_END(VOID);					//エンド画面
 VOID MY_END_PROC(VOID);				//エンド画面の処理
 VOID MY_END_DRAW(VOID);				//エンド画面の描画
-
-VOID MY_MENU(VOID);					//操作説明画面
-VOID MY_MENU_PROC(VOID);			//操作説明画面の処理
-VOID MY_MENU_DRAW(VOID);			//操作説明画面の描画
 
 BOOL MY_LOAD_IMAGE(VOID);			//画像をまとめて読み込む関数
 VOID MY_DELETE_IMAGE(VOID);			//画像をまとめて削除する関数
@@ -298,6 +307,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			break;
 		case GAME_SCENE_MENU:
 			MY_MENU();    //操作説明画面
+			break;
+		case GAME_SCENE_LEVEL:
+			MY_LEVEL();
 			break;
 		}
 
@@ -554,6 +566,12 @@ VOID MY_START_PROC(VOID)
 		GameScene = GAME_SCENE_MENU;
 	}
 
+	//コントロールキー(左 or 右)を押したら、level説明画面に移動する
+	if (MY_KEY_DOWN(KEY_INPUT_LCONTROL) || MY_KEY_DOWN(KEY_INPUT_RCONTROL) == TRUE)
+	{
+		GameScene = GAME_SCENE_LEVEL;
+	}
+
 	return;
 }
 
@@ -571,6 +589,9 @@ VOID MY_START_DRAW(VOID)
 	DrawGraph(ImageEasyMode.x, ImageEasyMode.y, ImageEasyMode.handle, TRUE);
 	DrawGraph(ImageNormalMode.x, ImageNormalMode.y, ImageNormalMode.handle, TRUE);
 	DrawGraph(ImageHardMode.x, ImageHardMode.y, ImageHardMode.handle, TRUE);
+
+	//level説明画面へ促すボタン
+	DrawGraph(ImageLEVELBtn.x, ImageLEVELBtn.y, ImageLEVELBtn.handle, TRUE);
 
 	return;
 }
@@ -620,6 +641,40 @@ VOID MY_MENU_DRAW(VOID)
 		DrawGraph(ImageMENU1.image.x, ImageMENU1.image.y, ImageMENU1.image.handle, TRUE);
 	if (ImageMENU2.IsDraw == TRUE)  //説明画像の2枚目
 		DrawGraph(ImageMENU2.image.x, ImageMENU2.image.y, ImageMENU2.image.handle, TRUE);
+	return;
+}
+
+//level説明画面
+VOID MY_LEVEL(VOID)
+{
+	MY_LEVEL_PROC();	//level説明画面の処理
+	MY_LEVEL_DRAW();	//level説明画面の描画
+
+	return;
+}
+
+//level説明画面の処理
+VOID MY_LEVEL_PROC(VOID)
+{
+	//バックスペースキーを押したら
+	if (MY_KEY_DOWN(KEY_INPUT_BACK) == TRUE)
+	{
+		//スタート画面に戻る
+		GameScene = GAME_SCENE_START;
+	}
+
+	return;
+}
+
+//level説明画面の描画
+VOID MY_LEVEL_DRAW(VOID)
+{
+	//背景の描画
+	DrawGraph(ImageMENUBK.x, ImageMENUBK.y, ImageMENUBK.handle, TRUE);
+
+	//level説明の描画
+	DrawGraph(ImageLEVELExp.x, ImageLEVELExp.y, ImageLEVELExp.handle, TRUE);
+
 	return;
 }
 
@@ -996,7 +1051,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 	ImagePLAYENDBK.x = GAME_WIDTH / 2 - ImagePLAYENDBK.width / 2;	//X位置を決める
 	ImagePLAYENDBK.y = GAME_HEIGHT / 2 - ImagePLAYENDBK.height / 2; //Y位置を決める
 
-	//操作説明画面へ促すためのボタン
+	//ボタンの画像(ルール説明行き)
 	strcpy_s(ImageMENUBtn.path, IMAGE_MENU_IMAGE_PATH);  //パスの設定
 	ImageMENUBtn.handle = LoadGraph(ImageMENUBtn.path);   //読み込み
 	if (ImageMENUBtn.handle == -1)
@@ -1145,7 +1200,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 	}
 	GetGraphSize(ImageEasyMode.handle, &ImageEasyMode.width, &ImageEasyMode.height);  //幅と高さを取得
 	ImageEasyMode.x = GAME_WIDTH / 2 - ImageEasyMode.width / 2;			//X位置を決める
-	ImageEasyMode.y = ImageTITLE.y + ImageTITLE.height + 15;			//Y位置を決める
+	ImageEasyMode.y = ImageTITLE.y + ImageTITLE.height + 45;			//Y位置を決める
 
 	//Normalモードへ促すためのボタン
 	strcpy_s(ImageNormalMode.path, IMAGE_NORMALMODE_PATH);  //パスの設定
@@ -1158,7 +1213,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 	}
 	GetGraphSize(ImageNormalMode.handle, &ImageNormalMode.width, &ImageNormalMode.height);  //幅と高さを取得
 	ImageNormalMode.x = GAME_WIDTH / 2 - ImageNormalMode.width / 2;			//X位置を決める
-	ImageNormalMode.y = ImageEasyMode.y + ImageEasyMode.height + 15;			//Y位置を決める
+	ImageNormalMode.y = ImageEasyMode.y + ImageEasyMode.height + 30;		//Y位置を決める
 
 	//Hardモードへ促すためのボタン
 	strcpy_s(ImageHardMode.path, IMAGE_HARDMODE_PATH);  //パスの設定
@@ -1171,7 +1226,33 @@ BOOL MY_LOAD_IMAGE(VOID)
 	}
 	GetGraphSize(ImageHardMode.handle, &ImageHardMode.width, &ImageHardMode.height);  //幅と高さを取得
 	ImageHardMode.x = GAME_WIDTH / 2 - ImageHardMode.width / 2;			//X位置を決める
-	ImageHardMode.y = ImageNormalMode.y + ImageNormalMode.height + 15;				//Y位置を決める
+	ImageHardMode.y = ImageNormalMode.y + ImageNormalMode.height + 30;	//Y位置を決める
+
+	//ボタンの画像(level説明行き)
+	strcpy_s(ImageLEVELBtn.path, IMAGE_LEVEL_BUTTON_PATH);  //パスの設定
+	ImageLEVELBtn.handle = LoadGraph(ImageLEVELBtn.path);   //読み込み
+	if (ImageLEVELBtn.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), IMAGE_LEVEL_BUTTON_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImageLEVELBtn.handle, &ImageLEVELBtn.width, &ImageLEVELBtn.height);  //幅と高さを取得
+	ImageLEVELBtn.x = 0 + 20;											//X位置を決める
+	ImageLEVELBtn.y = GAME_HEIGHT - ImageLEVELBtn.height - 20;			//Y位置を決める
+
+	//level説明
+	strcpy_s(ImageLEVELExp.path, IMAGE_LEVEL_EXP_PATH);  //パスの設定
+	ImageLEVELExp.handle = LoadGraph(ImageLEVELExp.path);   //読み込み
+	if (ImageLEVELExp.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), IMAGE_LEVEL_EXP_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImageLEVELExp.handle, &ImageLEVELExp.width, &ImageLEVELExp.height);  //幅と高さを取得
+	ImageLEVELExp.x = 0;												//X位置を決める
+	ImageLEVELExp.y = 0;												//Y位置を決める
 
 	return TRUE;
 }
@@ -1195,7 +1276,7 @@ VOID MY_DELETE_IMAGE(VOID)
 	DeleteGraph(ImageEndClear.handle);
 	DeleteGraph(ImageEndFail.handle);
 
-	//操作説明の画像
+	//操作説明関連の画像
 	DeleteGraph(ImageMENU1.image.handle);
 	DeleteGraph(ImageMENU2.image.handle);
 
@@ -1203,9 +1284,14 @@ VOID MY_DELETE_IMAGE(VOID)
 	DeleteGraph(ImageMessage1.handle);
 	DeleteGraph(ImageMessage2.handle);
 
+	//各レベルへ促すためのボタン
 	DeleteGraph(ImageEasyMode.handle);
 	DeleteGraph(ImageNormalMode.handle);
 	DeleteGraph(ImageHardMode.handle);
+
+	//level説明関連の画像
+	DeleteGraph(ImageLEVELBtn.handle);
+	DeleteGraph(ImageLEVELExp.handle);
 
 	return;
 }
