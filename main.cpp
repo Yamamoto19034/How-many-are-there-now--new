@@ -22,22 +22,23 @@
 #define IMAGE_LOAD_ERR_TITLE			TEXT("画像読み込みエラー")
 
 //画像関連	
-#define IMAGE_START_BG_PATH				TEXT(".\\IMAGE\\スタート画面.png")  //背景(スタート画面)の画像
-#define IMAGE_TITLE_PATH				TEXT(".\\IMAGE\\title.png")			//タイトル画像
-#define IMAGE_PLAY_BG_PATH				TEXT(".\\IMAGE\\森の中.png")		//背景(プレイ・エンド)の画像
-#define IMAGE_MENU_BUTTON_PATH			TEXT(".\\IMAGE\\操作説明.png")		//ボタンの画像(ルール説明行き)
-#define IMAGE_MENU_BG_PATH				TEXT(".\\IMAGE\\menu_背景.png")		//背景(操作説明画面・ルール説明画面)の画像
-#define IMAGE_END_CLEAR_PATH			TEXT(".\\IMAGE\\GameClear.png")		//クリアの画像
-#define IMAGE_END_FAIL_PATH				TEXT(".\\IMAGE\\sippai.png")		//ゲームオーバーの画像
-#define IMAGE_MENU_1_PATH				TEXT(".\\IMAGE\\操作説明-1.png")	//操作説明の1枚目
-#define IMAGE_MENU_2_PATH				TEXT(".\\IMAGE\\操作説明-2.png")	//操作説明の2枚目
-#define IMAGE_MESSAGE_1_PATH			TEXT(".\\IMAGE\\message-1.png")		//お客様からのメッセージ(成功パターン)
-#define IMAGE_MESSAGE_2_PATH			TEXT(".\\IMAGE\\message-2.png")     //お客様からのメッセージ(失敗パターン)
-#define IMAGE_EASYMODE_PATH				TEXT(".\\IMAGE\\Easy.png")			//Easyモードへ促すためのボタン
-#define IMAGE_NORMALMODE_PATH			TEXT(".\\IMAGE\\Normal.png")		//Normalモードへ促すためのボタン
-#define IMAGE_HARDMODE_PATH				TEXT(".\\IMAGE\\Hard.png")			//Hardモードへ促すためのボタン
-#define IMAGE_LEVEL_BUTTON_PATH			TEXT(".\\IMAGE\\level説明.png")		//ボタンの画像(level説明行き)
-#define IMAGE_LEVEL_EXP_PATH			TEXT(".\\IMAGE\\level説明画像.png") //level説明
+#define IMAGE_START_BG_PATH				TEXT(".\\IMAGE\\スタート画面.png")		//背景(スタート画面)の画像
+#define IMAGE_TITLE_PATH				TEXT(".\\IMAGE\\title.png")				//タイトル画像
+#define IMAGE_PLAY_BG_PATH				TEXT(".\\IMAGE\\森の中.png")			//背景(プレイ・エンド)の画像
+#define IMAGE_MENU_BUTTON_PATH			TEXT(".\\IMAGE\\操作説明.png")			//ボタンの画像(ルール説明行き)
+#define IMAGE_MENU_BG_PATH				TEXT(".\\IMAGE\\menu_背景.png")			//背景(操作説明画面・ルール説明画面)の画像
+#define IMAGE_END_CLEAR_PATH			TEXT(".\\IMAGE\\GameClear.png")			//クリアの画像
+#define IMAGE_END_FAIL_PATH				TEXT(".\\IMAGE\\sippai.png")			//ゲームオーバーの画像
+#define IMAGE_MENU_1_PATH				TEXT(".\\IMAGE\\操作説明-1.png")		//操作説明の1枚目
+#define IMAGE_MENU_2_PATH				TEXT(".\\IMAGE\\操作説明-2.png")		//操作説明の2枚目
+#define IMAGE_MESSAGE_1_PATH			TEXT(".\\IMAGE\\message-1.png")			//お客様からのメッセージ(成功パターン)
+#define IMAGE_MESSAGE_2_PATH			TEXT(".\\IMAGE\\message-2.png")			//お客様からのメッセージ(失敗パターン)
+#define IMAGE_BACK_BACKSPACE_KEY_PATH	TEXT(".\\IMAGE\\Back_BackSpaceKey.png")	//スタート画面に戻るように促すための画像
+#define IMAGE_EASYMODE_PATH				TEXT(".\\IMAGE\\Easy.png")				//Easyモードへ促すためのボタン
+#define IMAGE_NORMALMODE_PATH			TEXT(".\\IMAGE\\Normal.png")			//Normalモードへ促すためのボタン
+#define IMAGE_HARDMODE_PATH				TEXT(".\\IMAGE\\Hard.png")				//Hardモードへ促すためのボタン
+#define IMAGE_LEVEL_BUTTON_PATH			TEXT(".\\IMAGE\\level説明.png")			//ボタンの画像(level説明行き)
+#define IMAGE_LEVEL_EXP_PATH			TEXT(".\\IMAGE\\level説明画像.png")		//level説明
 
 //動物チップ関連
 #define GAME_animal1_CHIP_PATH			TEXT(".\\IMAGE\\animal\\mapchip_1.png")  //チップの画像
@@ -185,6 +186,7 @@ IMAGE_MENU ImageMENU1;	//操作説明の1枚目
 IMAGE_MENU ImageMENU2;  //操作説明の2枚目
 IMAGE ImageMessage1;	//お客様からのメッセージ(成功パターン)
 IMAGE ImageMessage2;    //お客様からのメッセージ(失敗パターン)
+IMAGE ImageBack_BSK;    //スタート画面に戻るように促すための画像 BSK = Back Space Key
 IMAGE ImageEasyMode;	//Easyモードへ促すためのボタン
 IMAGE ImageNormalMode;	//Normalモードへ促すためのボタン
 IMAGE ImageHardMode;	//Hardモードへ促すためのボタン
@@ -1006,6 +1008,8 @@ VOID MY_END_DRAW(VOID)
 		break;
 	}
 
+	DrawGraph(ImageBack_BSK.x, ImageBack_BSK.y, ImageBack_BSK.handle, TRUE);
+
 	return;
 }
 
@@ -1189,6 +1193,18 @@ BOOL MY_LOAD_IMAGE(VOID)
 	ImageMessage2.x = GAME_WIDTH / 2 - ImageMessage2.width / 2;			//X位置を決める
 	ImageMessage2.y = ImageEndFail.y + ImageEndFail.height;				//Y位置を決める
 
+	strcpy_s(ImageBack_BSK.path, IMAGE_BACK_BACKSPACE_KEY_PATH);  //パスの設定
+	ImageBack_BSK.handle = LoadGraph(ImageBack_BSK.path);   //読み込み
+	if (ImageBack_BSK.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), IMAGE_BACK_BACKSPACE_KEY_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImageBack_BSK.handle, &ImageBack_BSK.width, &ImageBack_BSK.height);  //幅と高さを取得
+	ImageBack_BSK.x = GAME_WIDTH - ImageBack_BSK.width - 10;			//X位置を決める
+	ImageBack_BSK.y = 0 + 10;												//Y位置を決める
+
 	//Easyモードへ促すためのボタン
 	strcpy_s(ImageEasyMode.path, IMAGE_EASYMODE_PATH);  //パスの設定
 	ImageEasyMode.handle = LoadGraph(ImageEasyMode.path);   //読み込み
@@ -1283,6 +1299,9 @@ VOID MY_DELETE_IMAGE(VOID)
 	//メッセージの画像
 	DeleteGraph(ImageMessage1.handle);
 	DeleteGraph(ImageMessage2.handle);
+
+	//スタート画面に戻るよう促すための画像
+	DeleteGraph(ImageBack_BSK.handle);
 
 	//各レベルへ促すためのボタン
 	DeleteGraph(ImageEasyMode.handle);
