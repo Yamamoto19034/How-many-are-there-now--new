@@ -40,22 +40,22 @@
 
 //動物チップ関連
 #define GAME_animal1_CHIP_PATH			TEXT(".\\IMAGE\\animal\\mapchip_1.png")  //チップの画像
-#define ANIMAL_MAX						4
+#define ANIMAL_MAX						4										 //動物は4種類
 
 //画像分割関連
 #define CHIP_DIV_WIDTH					565   //画像を分割する幅サイズ
 #define CHIP_DIV_HEIGHT					660   //画像を分割する高さサイズ
 #define GAME_animal1_DIV_TATE			2     //画像を縦に分割する数
 #define GAME_animal1_DIV_YOKO			2     //画像を横に分割する数
-#define CHIP_DIV_NUM GAME_animal1_DIV_TATE * GAME_animal1_DIV_YOKO  //画像を分割する総数
+#define CHIP_DIV_NUM  GAME_animal1_DIV_TATE * GAME_animal1_DIV_YOKO  //画像を分割する総数
 
 //マスク関連
 #define EASY_HAVE_MASK					20		//マスクの上限(Easyモード、20個)
 #define NORMAL_HAVE_MASK				50		//マスクの上限(Normalモード、50個)
 #define HARD_HAVE_MASK					100		//マスクの上限(Hardモード、100個)
-#define EASY_GIVE_MASK_RANGE			4		//マスクのランダム数(Easyモード、0～4)
-#define NORMAL_GIVE_MASK_RANGE			10		//マスクのランダム数(Normalモード、0～9)
-#define HARD_GIVE_MASK_RANGE			20		//マスクのランダム数(Hardモード、0～19)
+#define EASY_GIVE_MASK_RANGE			4		//マスクのランダム数(Easyモード、1個～5個)
+#define NORMAL_GIVE_MASK_RANGE			9		//マスクのランダム数(Normalモード、1個～10個)
+#define HARD_GIVE_MASK_RANGE			19		//マスクのランダム数(Hardモード、1個～20個)
 
 //フォントのパスの長さ
 #define FONT_PATH_MAX					255
@@ -195,7 +195,7 @@ IMAGE ImageLEVELExp;	//level説明
 
 //フォント
 FONT TANUKI;
-FONT CD_TANUKI;  //カウントダウン用のフォント
+FONT CD_TANUKI;			//カウントダウン用のフォント
 
 //クリアか失敗か
 int Jude;
@@ -218,8 +218,6 @@ VOID MY_FPS_WAIT(VOID);				//FPS値を計測し。待つ関数
 
 VOID MY_ALL_KEYDOWN_UPDATE(VOID);   //キーの入力状態を更新する
 BOOL MY_KEY_DOWN(int);			    //キーを押しているか、キーコードで判断する
-BOOL MY_KEY_UP(int);				//キーを押し上げたか、キーコードで判断する
-BOOL MY_KEYDOWN_KEEP(int, int);		//キーを押し続けているか、キーコードで判断する
 BOOL MY_KEYDOWN_1SECOND(int);		//キーを1秒間押し続けたか
 
 VOID MY_START(VOID);				//スタート画面
@@ -244,7 +242,7 @@ VOID MY_END_DRAW(VOID);				//エンド画面の描画
 
 BOOL MY_LOAD_IMAGE(VOID);			//画像をまとめて読み込む関数
 VOID MY_DELETE_IMAGE(VOID);			//画像をまとめて削除する関数
-VOID MY_PICTURE_INIT(VOID);			//画像の消去・初期化する関数
+VOID MY_INIT(VOID);					//画像の消去・初期化する関数
 
 BOOL MY_FONT_INSTALL_ONCE(VOID);    //フォントを一時的にインストール
 VOID MY_FONT_UNINSTALL_ONCE(VOID);  //フォントを一時的にアンインストール

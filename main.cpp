@@ -33,8 +33,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	SetDrawScreen(DX_SCREEN_BACK);	//Draw系関数は裏画面に描画
 
-	//StartTime = GetNowCount();
-
 	//無限ループ
 	while (TRUE)
 	{
@@ -42,9 +40,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		if (ClearDrawScreen() != 0) { break; }	//画面を消去できなかったとき、強制終了
 
-		MY_ALL_KEYDOWN_UPDATE();       //押しているキー状態を取得する
+		MY_ALL_KEYDOWN_UPDATE();				//押しているキー状態を取得する
 
-		MY_FPS_UPDATE();   //FPSの処理(更新)
+		MY_FPS_UPDATE();						//FPSの処理(更新)
 
 		//シーンごとに処理を行う
 		switch (GameScene)
@@ -174,42 +172,7 @@ BOOL MY_KEY_DOWN(int KEY_INPUT_)
 	}
 }
 
-
-//キーを押し上げたか、キーコードで判断する
-//引　数：int：キーコード：KEY_INPUT_???
-BOOL MY_KEY_UP(int KEY_INPUT_)
-{
-	if (OldAllKeyState[KEY_INPUT_] >= 1	//直前は押していて
-		&& AllKeyState[KEY_INPUT_] == 0)	//今は押していないとき
-	{
-		return TRUE;	//キーを押し上げている
-	}
-	else
-	{
-		return FALSE;	//キーを押し上げていない
-	}
-}
-
-//キーを押し続けているか、キーコードで判断する
-//引　数：int：キーコード：KEY_INPUT_???
-//引　数：int：キーを押し続ける時間
-BOOL MY_KEYDOWN_KEEP(int KEY_INPUT_, int DownTime)
-{
-	//押し続ける時間=秒数×FPS値
-	//例）60FPSのゲームで、1秒間押し続けるなら、1秒×60FPS
-	int UpdateTime = DownTime * GAME_FPS;
-
-	if (AllKeyState[KEY_INPUT_] > UpdateTime)
-	{
-		return TRUE;	//押し続けている
-	}
-	else
-	{
-		return FALSE;	//押し続けていない
-	}
-}
-
-//動物の画像変更用・操作説明画面用
+//動物の画像変更用・操作説明画面用(常に押しっぱなしの状況を避ける)
 BOOL MY_KEYDOWN_1SECOND(int KEY_INPUT_)
 {
 	//キーコードのキーを押している時
@@ -240,7 +203,7 @@ VOID MY_START_PROC(VOID)
 	{
 		//BGMの音量を下げる
 		ChangeVolumeSoundMem(255 * 50 / 100, START_BGM.handle);  //50%の音量にする
-		PlaySoundMem(START_BGM.handle, DX_PLAYTYPE_LOOP);
+		PlaySoundMem(START_BGM.handle, DX_PLAYTYPE_LOOP);		 //ループ再生
 	}
 
 	//1キーを押したら、プレイシーンへ移動する(Easyモード)
@@ -263,7 +226,7 @@ VOID MY_START_PROC(VOID)
 		{
 			//効果音の音量を下げる
 			ChangeVolumeSoundMem(255 * 50 / 100, SF_BUTTON.handle);  //50%の音量にする
-			PlaySoundMem(SF_BUTTON.handle, DX_PLAYTYPE_BACK);
+			PlaySoundMem(SF_BUTTON.handle, DX_PLAYTYPE_BACK);		 //バックグラウンド再生
 		}
 	}
 	//2キーを押したら、プレイシーンへ移動する(Normalモード)
@@ -286,7 +249,7 @@ VOID MY_START_PROC(VOID)
 		{
 			//効果音の音量を下げる
 			ChangeVolumeSoundMem(255 * 50 / 100, SF_BUTTON.handle);  //50%の音量にする
-			PlaySoundMem(SF_BUTTON.handle, DX_PLAYTYPE_BACK);
+			PlaySoundMem(SF_BUTTON.handle, DX_PLAYTYPE_BACK);		 //バックグラウンド再生
 		}
 	}
 	//3キーを押したら、プレイシーンへ移動する(Hardモード)
@@ -309,11 +272,11 @@ VOID MY_START_PROC(VOID)
 		{
 			//効果音の音量を下げる
 			ChangeVolumeSoundMem(255 * 50 / 100, SF_BUTTON.handle);  //50%の音量にする
-			PlaySoundMem(SF_BUTTON.handle, DX_PLAYTYPE_BACK);
+			PlaySoundMem(SF_BUTTON.handle, DX_PLAYTYPE_BACK);		 //バックグラウンド再生
 		}
 	}
 
-	//シフトキー(左シフトキー or 右シフトキー)を押したら、操作説明画面に移動する
+	//シフトキー(左 or 右)を押したら、操作説明画面に移動する
 	if (MY_KEY_DOWN(KEY_INPUT_LSHIFT) || MY_KEY_DOWN(KEY_INPUT_RSHIFT) == TRUE)
 	{
 		GameScene = GAME_SCENE_MENU;
@@ -448,7 +411,7 @@ VOID MY_PLAY_PROC(VOID)
 	{
 		//BGMの音量を下げる
 		ChangeVolumeSoundMem(255 * 50 / 100, PLAY_BGM.handle);  //50%の音量にする
-		PlaySoundMem(PLAY_BGM.handle, DX_PLAYTYPE_LOOP);
+		PlaySoundMem(PLAY_BGM.handle, DX_PLAYTYPE_LOOP);		//ループ再生
 	}
 
 	if (First_flg)  //まずカウントダウンからスタート
@@ -456,7 +419,7 @@ VOID MY_PLAY_PROC(VOID)
 		if (CountDown)  //基準時間を取得
 		{
 			StartTime = GetNowCount();
-			CountDown = FALSE;		//これ以降はこのif文は行わない
+			CountDown = FALSE;		//これ以降,このif文は行わない
 		}
 
 		int NowCount = GetNowCount();
@@ -475,7 +438,7 @@ VOID MY_PLAY_PROC(VOID)
 		{
 			//効果音の音量を下げる
 			ChangeVolumeSoundMem(255 * 50 / 100, SF_TIME.handle);  //50%の音量にする
-			PlaySoundMem(SF_TIME.handle, DX_PLAYTYPE_BACK);
+			PlaySoundMem(SF_TIME.handle, DX_PLAYTYPE_BACK);		   //バックグラウンド再生
 		}
 	}
 	else
@@ -491,7 +454,7 @@ VOID MY_PLAY_PROC(VOID)
 		{
 			//効果音の音量を下げる
 			ChangeVolumeSoundMem(255 * 50 / 100, SF_TIME.handle);  //50%の音量にする
-			PlaySoundMem(SF_TIME.handle, DX_PLAYTYPE_BACK);
+			PlaySoundMem(SF_TIME.handle, DX_PLAYTYPE_BACK);		   //バックグラウンド再生
 		}
 
 		//経過時間が0秒になったら(・・・3,2,1 で終了させるため <=)
@@ -502,7 +465,7 @@ VOID MY_PLAY_PROC(VOID)
 			GameScene = GAME_SCENE_END;  //エンド画面へ
 
 			//画像の消去・初期化
-			MY_PICTURE_INIT();
+			MY_INIT();
 
 			//BGMが流れているなら
 			if (CheckSoundMem(PLAY_BGM.handle) != 0)
@@ -519,6 +482,7 @@ VOID MY_PLAY_PROC(VOID)
 			animal[order].IsDraw = TRUE;			//表示
 			order++;
 
+			//乱数を取得
 			Mask_num = GetRand(GiveMask) + 1;
 
 			First_Qus = FALSE;  //次以降は表示しない
@@ -541,7 +505,7 @@ VOID MY_PLAY_PROC(VOID)
 				GameScene = GAME_SCENE_END;  //エンド画面に移動
 
 				//画像の消去・初期化
-				MY_PICTURE_INIT();
+				MY_INIT();
 
 				//BGMが流れているなら
 				if (CheckSoundMem(PLAY_BGM.handle) != 0)
@@ -553,21 +517,21 @@ VOID MY_PLAY_PROC(VOID)
 			}
 
 			//単体で表示する
-			if (order == 0)
+			if (order == 0)  //1番目用
 			{
 				//描画する
-				animal[ANIMAL_MAX - 1].IsDraw = FALSE;  //一個前の絵を消す
+				animal[ANIMAL_MAX - 1].IsDraw = FALSE;  //一個前の絵を消す(最後尾の絵)
 				animal[order].IsDraw = TRUE;			//表示
 				order++;
 			}
-			else if (order == 3)
+			else if (order == ANIMAL_MAX - 1)  //最後尾用
 			{
 				//描画
 				animal[order - 1].IsDraw = FALSE;		//一個前の絵を消す
 				animal[order].IsDraw = TRUE;			//表示
 				order = 0;								//最初から
 			}
-			else
+			else  //それ以外
 			{
 				//描画
 				animal[order - 1].IsDraw = FALSE;		//一個前の絵を消す
@@ -589,7 +553,7 @@ VOID MY_PLAY_PROC(VOID)
 				GameScene = GAME_SCENE_END;  //エンド画面に移動
 
 				//画像の消去・初期化
-				MY_PICTURE_INIT();
+				MY_INIT();
 
 				//BGMが流れているなら
 				if (CheckSoundMem(PLAY_BGM.handle) != 0)
@@ -607,7 +571,7 @@ VOID MY_PLAY_PROC(VOID)
 				GameScene = GAME_SCENE_END;  //エンド画面に移動
 
 				//画像の消去・初期化
-				MY_PICTURE_INIT();
+				MY_INIT();
 
 				//BGMが流れているなら
 				if (CheckSoundMem(PLAY_BGM.handle) != 0)
@@ -629,7 +593,7 @@ VOID MY_PLAY_DRAW(VOID)
 	//プレイ画面の背景
 	DrawGraph(ImagePLAYENDBG.x, ImagePLAYENDBG.y, ImagePLAYENDBG.handle, TRUE);
 
-	if (First_flg)
+	if (First_flg)  //最初のカウントダウン
 	{
 		DrawFormatStringToHandle(GAME_WIDTH / 2 - 125, GAME_HEIGHT / 2 - 120, GetColor(255, 0, 0), CD_TANUKI.handle, "%d", (ElaTime / 1000) + 1);
 	}
@@ -665,7 +629,7 @@ VOID MY_PLAY_DRAW(VOID)
 			//欲しいマスクの表示
 			DrawFormatStringToHandle(170, GAME_HEIGHT - 170, GetColor(255, 255, 255), TANUKI.handle, "マスク %d個 ちょうだい！！", Mask_num);
 
-			//デバッグ用
+			//デバッグ用(マスクの個数を表示する)
 			//DrawFormatStringToHandle(0, 0, GetColor(255, 255, 255), TANUKI.handle, "%d個", Mask_sum);
 
 			//「あげる？」「あげない？」の追加
@@ -700,7 +664,7 @@ VOID MY_END_PROC(VOID)
 		{
 			//BGMの音量を下げる
 			ChangeVolumeSoundMem(255 * 50 / 100, END_CLEAR_BGM.handle);  //50%の音量にする
-			PlaySoundMem(END_CLEAR_BGM.handle, DX_PLAYTYPE_LOOP);
+			PlaySoundMem(END_CLEAR_BGM.handle, DX_PLAYTYPE_LOOP);		 //バックグラウンド再生
 		}
 		break;
 
@@ -710,7 +674,7 @@ VOID MY_END_PROC(VOID)
 		{
 			//BGMの音量を下げる
 			ChangeVolumeSoundMem(255 * 50 / 100, END_FAIL_BGM.handle);  //50%の音量にする
-			PlaySoundMem(END_FAIL_BGM.handle, DX_PLAYTYPE_LOOP);
+			PlaySoundMem(END_FAIL_BGM.handle, DX_PLAYTYPE_LOOP);		//バックグラウンド再生
 		}
 		break;
 	}
@@ -1067,7 +1031,7 @@ VOID MY_DELETE_IMAGE(VOID)
 }
 
 //画像の消去・初期化
-VOID MY_PICTURE_INIT(VOID)
+VOID MY_INIT(VOID)
 {
 	//終了する際は全て消す
 	for (int cnt = 0; cnt < ANIMAL_MAX; cnt++)
